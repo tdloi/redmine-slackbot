@@ -1,0 +1,8 @@
+{
+    "env": {
+        "MONGODB_URI": "@mongodb-uri",
+        "AUTH_CRE": "@auth-cre",
+        "SLACK_BOT_TOKEN": "@slack-bot-token",
+        "SLACK_SIGNING_SECRET": "@slack-signing-secret"
+    }
+}

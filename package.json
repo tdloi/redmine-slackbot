@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "dependencies": {
+    "@now/node": "^1.1.2",
+    "@slack/web-api": "^5.5.0",
+    "@types/mongodb": "^3.3.11",
+    "dayjs": "^1.8.17",
+    "mongodb": "^3.3.4",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "now": "^16.5.2"
+  },
+  "engines": {
+    "node": "10.x"
+  },
+  "scripts": {
+    "start": "now dev",
+    "now": "now --prod"
+  }
+}
