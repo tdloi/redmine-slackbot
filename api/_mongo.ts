@@ -1,12 +1,11 @@
 import url from 'url';
-import { MongoClient } from 'mongodb';
-
+import { MongoClient, Db } from 'mongodb';
 // Create cached connection variable
 let cachedDb = null;
 
 // A function for connecting to MongoDB,
 // taking a single paramater of the connection string
-export async function getDb() {
+export async function getDb(): Promise<Db> {
   const uri = process.env.MONGODB_URI;
   // If the database connection is cached,
   // use it instead of creating a new connection

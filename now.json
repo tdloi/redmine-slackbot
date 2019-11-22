@@ -1,4 +1,5 @@
 {
+    "name": "redminebot",
     "env": {
         "MONGODB_URI": "@mongodb-uri",
         "AUTH_CRE": "@auth-cre",
