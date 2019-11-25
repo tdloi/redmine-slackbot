@@ -1,14 +1,12 @@
 import { NowRequest, NowResponse } from '@now/node';
 import { ViewsOpenArguments } from '@slack/web-api';
 import { isSlackRequest, slack } from './_slack';
-import { actions } from './_actions';
-import { IBlockActionsPayload, IGlobalConfig } from './_interface';
+import { actions } from './_settings';
+import { IBlockActionsPayload } from './_interface';
 import fetch from 'node-fetch';
 import { getModalConfigMessage } from './_messages';
-import { getGlobalConfig } from './_mongo';
 
 export default async (req: NowRequest, res: NowResponse) => {
-  console.log(req.body);
   if (isSlackRequest(req) === false) {
     res.status(400).json({ error: 'Your request is not comming from Slack' });
     return;
@@ -16,7 +14,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   // https://api.slack.com/interactivity/handling#payloads
   const body = JSON.parse(req.body.payload);
-  const globalConfig: IGlobalConfig = await getGlobalConfig();
 
   if (body.type === 'block_actions') {
     const payload: IBlockActionsPayload = body;
@@ -40,7 +37,7 @@ export default async (req: NowRequest, res: NowResponse) => {
       case actions.CONFIG:
         await slack.views.open({
           trigger_id: payload.trigger_id,
-          view: JSON.parse(getModalConfigMessage(globalConfig)),
+          view: JSON.parse(getModalConfigMessage()),
         } as ViewsOpenArguments);
         res.status(200).send(null);
         return;

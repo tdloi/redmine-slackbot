@@ -2,11 +2,7 @@ import { WebAPICallResult } from '@slack/web-api';
 import { NowRequest } from '@now/node';
 
 export interface IGlobalConfig {
-  _type: 'globalConfig';
-  url: string; // REDMINE URL, DOES NOT contain trailing slash
-  workHours: number;
-  timezone: number; // e.g: 7
-  excludes: Array<string>; // day to exclude
+  excludesDate: Array<string>; // day to exclude
 }
 
 export interface IUserConfig {

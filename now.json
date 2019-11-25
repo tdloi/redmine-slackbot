@@ -3,7 +3,11 @@
     "env": {
         "MONGODB_URI": "@mongodb-uri",
         "AUTH_CRE": "@auth-cre",
+        "SLACK_TEAM_ID": "@slack-team-id",
         "SLACK_BOT_TOKEN": "@slack-bot-token",
-        "SLACK_SIGNING_SECRET": "@slack-signing-secret"
+        "SLACK_SIGNING_SECRET": "@slack-signing-secret",
+        "REDMINE_URL": "@redmine-url",
+        "WORK_HOURS": "@work-hours",
+        "TIMEZONE": "@timezone"
     }
 }

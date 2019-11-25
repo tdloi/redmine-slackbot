@@ -1,10 +1,10 @@
 import nunjucks from 'nunjucks';
 import { IUserConfig, IGlobalConfig, IRedmineIssue } from './_interface';
-import { actions } from './_actions';
+import { actions, configs } from './_settings';
 
 nunjucks.configure({ autoescape: true });
 
-export function getConfigMessage(globalConfig: IGlobalConfig, userConfig: IUserConfig): string {
+export function getConfigMessage(userConfig: IUserConfig): string {
   return nunjucks.renderString(
     `
   {
@@ -12,10 +12,10 @@ export function getConfigMessage(globalConfig: IGlobalConfig, userConfig: IUserC
       {
         "type": "section",
         "fields": [
-          { "type": "mrkdwn", "text": "*URL:* {{ globalConfig.url }}"},
+          { "type": "mrkdwn", "text": "*URL:* {{ url }}"},
           { "type": "mrkdwn", "text": " "},
-          { "type": "mrkdwn", "text": "*Work hours:* {{ globalConfig.workHours }} hours"},
-          { "type": "mrkdwn", "text": "*Timezone:* {{ globalConfig.timezone }}"}
+          { "type": "mrkdwn", "text": "*Work hours:* {{ workHours }} hours"},
+          { "type": "mrkdwn", "text": "*Timezone:* {{ timezone }}"}
           {% if userConfig !== null %}
           ,
           { "type": "mrkdwn", "text": "*Userid:* {{ userConfig.userId }}"},
@@ -54,14 +54,16 @@ export function getConfigMessage(globalConfig: IGlobalConfig, userConfig: IUserC
   }
   `,
     {
-      globalConfig: globalConfig,
       userConfig: userConfig,
+      url: configs.REDMINE_URL,
+      workHours: configs.WORK_HOURS,
+      timezone: configs.TIMEZONE,
       actions: { edit: actions.CONFIG, close: actions.CLOSE },
     }
   );
 }
 
-export function getModalConfigMessage(globalConfig: IGlobalConfig, error_message: string = null) {
+export function getModalConfigMessage(error_message: string = null) {
   return nunjucks.renderString(
     `
     [
@@ -86,7 +88,7 @@ export function getModalConfigMessage(globalConfig: IGlobalConfig, error_message
         },
         "hint": {
           "type": "plain_text",
-          "text": "Get at <{{ globalConfig.url }}>"
+          "text": "Get at <{{ url }}/my/account>"
         }
       },
       {
@@ -116,6 +118,38 @@ export function getModalConfigMessage(globalConfig: IGlobalConfig, error_message
         "label": {
           "type": "plain_text",
           "text": "Reminder hours",
+          "emoji": true
+        }
+      },
+      {
+        "type": "input",
+        "block_id": "includeClosed",
+        "element": {
+          "type": "static_select",
+          "placeholder": {
+            "type": "plain_text",
+            "text": "Include closed issues",
+          },
+          "options": [
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "Yes",
+              },
+              "value": "true"
+            },
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "No",
+              },
+              "value": "false"
+            }
+          ]
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Include closed issues",
           "emoji": true
         }
       },
@@ -169,6 +203,6 @@ export function getModalConfigMessage(globalConfig: IGlobalConfig, error_message
       }
     ]
     `,
-    { globalConfig: globalConfig, error: error_message }
+    { url: configs.REDMINE_URL, error: error_message }
   );
 }

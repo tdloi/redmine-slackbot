@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node';
-import { getDb, getGlobalConfig, getUserConfig } from './_mongo';
-import { IGlobalConfig, IUserConfig, ISlashCommandPayload } from './_interface';
+import { getUserConfig } from './_mongo';
+import { IUserConfig, ISlashCommandPayload } from './_interface';
 import { isSlackRequest } from './_slack';
 import { getConfigMessage } from './_messages';
 
@@ -16,8 +16,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     return;
   }
 
-  const globalConfig: IGlobalConfig = await getGlobalConfig();
   const userConfig: IUserConfig = await getUserConfig(payload.user_id);
 
-  res.status(200).json(JSON.parse(getConfigMessage(globalConfig, userConfig)));
+  res.status(200).json(JSON.parse(getConfigMessage(userConfig)));
 };
