@@ -1,5 +1,6 @@
 .now
 node_modules/
 .env*
+!.env.example
 .vscode/
 yarn-error.log
