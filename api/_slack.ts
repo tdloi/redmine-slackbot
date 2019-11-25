@@ -15,7 +15,6 @@ export function isSlackRequest(req: NowRequest): boolean {
     return false;
   }
   const verifyString = `v0:${timestamp}:${encode(req.body)}`;
-  console.log(verifyString);
   const hmac = createHmac('sha256', process.env.SLACK_SIGNING_SECRET);
   hmac.update(verifyString);
   const hex = `v0=${hmac.digest('hex')}`;

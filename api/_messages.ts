@@ -1,6 +1,7 @@
 import nunjucks from 'nunjucks';
 import { IUserConfig, IGlobalConfig, IRedmineIssue } from './_interface';
-import { action } from './_actions';
+import { actions } from './_actions';
+
 nunjucks.configure({ autoescape: true });
 
 export function getConfigMessage(globalConfig: IGlobalConfig, userConfig: IUserConfig): string {
@@ -11,7 +12,7 @@ export function getConfigMessage(globalConfig: IGlobalConfig, userConfig: IUserC
       {
         "type": "section",
         "fields": [
-          { "type": "mrkdwn", "text": "*URL:* "},
+          { "type": "mrkdwn", "text": "*URL:* {{ globalConfig.url }}"},
           { "type": "mrkdwn", "text": " "},
           { "type": "mrkdwn", "text": "*Work hours:* {{ globalConfig.workHours }} hours"},
           { "type": "mrkdwn", "text": "*Timezone:* {{ globalConfig.timezone }}"}
@@ -55,7 +56,7 @@ export function getConfigMessage(globalConfig: IGlobalConfig, userConfig: IUserC
     {
       globalConfig: globalConfig,
       userConfig: userConfig,
-      actions: { edit: action.EDIT_CONFIG, close: action.CLOSE },
+      actions: { edit: actions.CONFIG, close: actions.CLOSE },
     }
   );
 }

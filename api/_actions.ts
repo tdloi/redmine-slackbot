@@ -1,4 +1,4 @@
-export const action = {
-  EDIT_CONFIG: 'edit_config',
+export const actions = {
+  CONFIG: 'edit_config',
   CLOSE: 'delete_message',
 };
