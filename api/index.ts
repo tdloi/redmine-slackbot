@@ -1,5 +1,5 @@
 import { NowRequest, NowResponse } from '@now/node';
-import { getDb } from './_mongo';
+import { getDb, getGlobalConfig, getUserConfig } from './_mongo';
 import { IGlobalConfig, IUserConfig, ISlashCommandPayload } from './_interface';
 import { isSlackRequest } from './_slack';
 import { getConfigMessage } from './_messages';
@@ -16,14 +16,8 @@ export default async (req: NowRequest, res: NowResponse) => {
     return;
   }
 
-  const db = await getDb();
-  const globalConfig: IGlobalConfig = await db.collection('configs').findOne({
-    _type: 'globalConfig',
-  });
-  const userConfig: IUserConfig = await db.collection('configs').findOne({
-    _type: 'userConfig',
-    userId: payload.user_id,
-  } as IUserConfig);
+  const globalConfig: IGlobalConfig = await getGlobalConfig();
+  const userConfig: IUserConfig = await getUserConfig(payload.user_id);
 
   res.status(200).json(JSON.parse(getConfigMessage(globalConfig, userConfig)));
 };

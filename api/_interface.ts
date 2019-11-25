@@ -1,6 +1,5 @@
 import { WebAPICallResult } from '@slack/web-api';
 import { NowRequest } from '@now/node';
-import { actions } from './_actions';
 
 export interface IGlobalConfig {
   _type: 'globalConfig';

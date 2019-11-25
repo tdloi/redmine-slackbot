@@ -1,11 +1,14 @@
 import { NowRequest, NowResponse } from '@now/node';
-import { ChatDeleteArguments } from '@slack/web-api';
+import { ViewsOpenArguments } from '@slack/web-api';
 import { isSlackRequest, slack } from './_slack';
 import { actions } from './_actions';
-import { IBlockActionsPayload } from './_interface';
+import { IBlockActionsPayload, IGlobalConfig } from './_interface';
 import fetch from 'node-fetch';
+import { getModalConfigMessage } from './_messages';
+import { getGlobalConfig } from './_mongo';
 
 export default async (req: NowRequest, res: NowResponse) => {
+  console.log(req.body);
   if (isSlackRequest(req) === false) {
     res.status(400).json({ error: 'Your request is not comming from Slack' });
     return;
@@ -13,20 +16,14 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   // https://api.slack.com/interactivity/handling#payloads
   const body = JSON.parse(req.body.payload);
+  const globalConfig: IGlobalConfig = await getGlobalConfig();
+
   if (body.type === 'block_actions') {
     const payload: IBlockActionsPayload = body;
-    if (
-      payload.actions == null ||
-      payload.actions.length == 0 ||
-      !Object.values(actions).includes(payload.actions[0].action_id)
-    ) {
-      res.status(400).json({ error: 'Invalid action' });
-      return;
-    }
     switch (payload.actions[0].action_id) {
       case actions.CLOSE:
         // can't delete ephemeral message via delete api
-        fetch(payload.response_url, {
+        await fetch(payload.response_url, {
           method: 'POST',
           body: JSON.stringify({
             response_type: 'ephemeral',
@@ -40,9 +37,17 @@ export default async (req: NowRequest, res: NowResponse) => {
         });
         res.status(200).send(null);
         return;
+      case actions.CONFIG:
+        await slack.views.open({
+          trigger_id: payload.trigger_id,
+          view: JSON.parse(getModalConfigMessage(globalConfig)),
+        } as ViewsOpenArguments);
+        res.status(200).send(null);
+        return;
       default:
         break;
     }
+  } else if (body.type === 'view_submission') {
   }
 
   res.status(200).send(null);
