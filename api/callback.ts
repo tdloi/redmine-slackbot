@@ -32,14 +32,14 @@ export default async (req: NowRequest, res: NowResponse) => {
             Authorization: 'Bearer ' + process.env.SLACK_BOT_TOKEN,
           },
         });
-        res.status(200).send(null);
-        return;
+        return res.status(200).send(null);
       case actions.CONFIG:
         await slack.views.open({
           trigger_id: payload.trigger_id,
           view: JSON.parse(getModalConfigMessage()),
         } as ViewsOpenArguments);
-        res.status(200).send(null);
+        return res.status(200).send(null);
+      case actions.LOG:
         return;
       default:
         break;

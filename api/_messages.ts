@@ -1,6 +1,7 @@
 import nunjucks from 'nunjucks';
 import { IUserConfig, IGlobalConfig, IRedmineIssue } from './_interface';
 import { actions, configs } from './_settings';
+import { Dayjs } from 'dayjs';
 
 nunjucks.configure({ autoescape: true });
 
@@ -63,7 +64,7 @@ export function getConfigMessage(userConfig: IUserConfig): string {
   );
 }
 
-export function getModalConfigMessage(error_message: string = null) {
+export function getModalConfigMessage(error_message: string = null): string {
   return nunjucks.renderString(
     `
     [
@@ -204,5 +205,176 @@ export function getModalConfigMessage(error_message: string = null) {
     ]
     `,
     { url: configs.REDMINE_URL, error: error_message }
+  );
+}
+
+export function getLogTimeMessage(
+  userConfig: IUserConfig,
+  issues: Array<IRedmineIssue>,
+  date: Dayjs,
+  loggedHour: number
+): string {
+  const logDate = date.format('DD/MM/YYYY');
+  return nunjucks.renderString(
+    `
+    [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*Date:*\t\t{{ date }}\n*Logged:*\t{{ hour }} hours"
+        }
+      },
+      {
+        "type": "divider"
+      },
+      {% for issue in issues %}
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "\`[{{ issue.project.name }}]\` \`#{{ issue.id }}\`: {{ issue.subject }}"
+        }
+      },
+      {
+        "type": "actions",
+        "elements": [
+          {% if logHour >= 8 %}
+          {
+            "type": "button",
+            "action_id": "{{ action }}",
+            "text": {
+              "type": "plain_text",
+              "emoji": true,
+              "text": "8h"
+            },
+            "style": "primary",
+            "value": "8",
+            "confirm": {
+              "title": {
+                "type": "plain_text",
+                "text": "Are you sure?"
+              },
+              "text": {
+                "type": "mrkdwn",
+                "text": "You can't change once logged"
+              },
+              "confirm": {
+                "type": "plain_text",
+                "text": "Do it"
+              },
+              "deny": {
+                "type": "plain_text",
+                "text": "Stop, I've changed my mind!"
+              }
+            }
+          },
+          {% endif %}
+          {% if remainHour >= 4 %}
+          {
+            "type": "button",
+            "action_id": "{{ action }}",
+            "text": {
+              "type": "plain_text",
+              "text": "4h"
+            },
+            "value": "4",
+            "confirm": {
+              "title": {
+                "type": "plain_text",
+                "text": "Are you sure?"
+              },
+              "text": {
+                "type": "mrkdwn",
+                "text": "You can't change once logged"
+              },
+              "confirm": {
+                "type": "plain_text",
+                "text": "Do it"
+              },
+              "deny": {
+                "type": "plain_text",
+                "text": "Stop, I've changed my mind!"
+              }
+            }
+          },
+          {% endif %}
+          {% if remainHour >= 2 %}
+          {
+            "type": "button",
+            "action_id": "{{ action }}",
+            "text": {
+              "type": "plain_text",
+              "text": "2h"
+            },
+            "value": "2",
+            "confirm": {
+              "title": {
+                "type": "plain_text",
+                "text": "Are you sure?"
+              },
+              "text": {
+                "type": "mrkdwn",
+                "text": "You can't change once logged"
+              },
+              "confirm": {
+                "type": "plain_text",
+                "text": "Do it"
+              },
+              "deny": {
+                "type": "plain_text",
+                "text": "Stop, I've changed my mind!"
+              }
+            }
+          }
+          {% endif %}
+        ]
+      },
+      {% endfor %}
+      {
+        "type": "divider"
+      },          
+      {
+        "type": "actions",
+        "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Close"
+          },
+          "style": "danger",
+          "value": "0",
+                  "confirm": {
+              "title": {
+                "type": "plain_text",
+                "text": "Are you sure?"
+              },
+              "text": {
+                "type": "mrkdwn",
+                "text": "You don't want to log time for {{ date }}"
+              },
+              "confirm": {
+                "type": "plain_text",
+                "text": "Yes"
+              },
+              "deny": {
+                "type": "plain_text",
+                "text": "Exit"
+              }
+            }
+        }
+        ]
+      }
+    ]
+    `,
+    {
+      config: userConfig,
+      issues: issues,
+      date: logDate,
+      hour: loggedHour,
+      remainHour: configs.WORK_HOURS - loggedHour,
+      action: actions.LOG,
+    }
   );
 }

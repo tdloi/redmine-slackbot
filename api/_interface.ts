@@ -23,6 +23,22 @@ export interface IRedmineIssue {
   subject: string;
 }
 
+interface IRedmineTimeEntry {
+  id: number;
+  project: {
+    id: number;
+    name: string;
+  };
+  hours: number;
+  comments: string;
+  spent_on: string;
+}
+
+export interface IRedmineTimeEntries {
+  time_entries: Array<IRedmineTimeEntry>;
+  total_count: number;
+}
+
 export interface IChatPostMessageResult extends WebAPICallResult {
   channel: string;
   ts: string;

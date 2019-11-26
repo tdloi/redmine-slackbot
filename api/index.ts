@@ -11,12 +11,16 @@ export default async (req: NowRequest, res: NowResponse) => {
   }
 
   const payload: ISlashCommandPayload = req.body;
-  if (payload.text !== 'config') {
-    res.status(200).json({ text: 'Invalid command. Available commands: `config`' });
-    return;
+
+  switch (payload.text) {
+    case 'config':
+      const userConfig: IUserConfig = await getUserConfig(payload.user_id);
+      return res.status(200).json(JSON.parse(getConfigMessage(userConfig)));
+    case 'log':
+      break;
+    default:
+      return res.status(200).json({
+        text: 'Invalid command. Available commands: `config`, `log`',
+      });
   }
-
-  const userConfig: IUserConfig = await getUserConfig(payload.user_id);
-
-  res.status(200).json(JSON.parse(getConfigMessage(userConfig)));
 };

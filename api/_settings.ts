@@ -1,6 +1,7 @@
 export const actions = {
   CONFIG: 'edit_config',
   CLOSE: 'delete_message',
+  LOG: 'log_time',
 };
 
 export const configs = {
