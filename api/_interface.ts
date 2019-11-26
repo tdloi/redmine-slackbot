@@ -14,13 +14,20 @@ export interface IUserConfig {
   remindAt: number; // Which hour to remind, 24h format
 }
 
-export interface IRedmineIssue {
+interface IRedmineIssue {
   id: number;
   project: {
     id: number;
     name: string;
   };
   subject: string;
+}
+
+export interface IRedmineIssues {
+  issues: Array<IRedmineIssue>;
+  total_count: number;
+  offset: number;
+  limit: number;
 }
 
 interface IRedmineTimeEntry {

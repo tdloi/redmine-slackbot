@@ -1,12 +1,12 @@
 import fetch from 'node-fetch';
-import { IRedmineIssue, IUserConfig, IRedmineTimeEntries } from './_interface';
+import { IUserConfig, IRedmineTimeEntries, IRedmineIssues } from './_interface';
 import { configs } from './_settings';
 import { Dayjs } from 'dayjs';
 
 export async function getIssues(
   userConfig: IUserConfig | null,
   token: string | null = null
-): Promise<Array<IRedmineIssue> | null> {
+): Promise<IRedmineIssues | null> {
   let status = '*';
   if (userConfig && userConfig.includeClosed) {
     status = 'open';
@@ -15,7 +15,7 @@ export async function getIssues(
     token = Buffer.from(userConfig.token, 'base64').toString('ascii');
   }
 
-  const issues: Array<IRedmineIssue> = await fetch(
+  const issues: IRedmineIssues = await fetch(
     `${configs.REDMINE_URL}/issues.json?assigned_to_id=me&status_id=${status}`,
     {
       headers: {

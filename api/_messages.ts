@@ -1,5 +1,5 @@
 import nunjucks from 'nunjucks';
-import { IUserConfig, IGlobalConfig, IRedmineIssue } from './_interface';
+import { IUserConfig, IRedmineIssues } from './_interface';
 import { actions, configs } from './_settings';
 import { Dayjs } from 'dayjs';
 
@@ -210,7 +210,7 @@ export function getModalConfigMessage(error_message: string = null): string {
 
 export function getLogTimeMessage(
   userConfig: IUserConfig,
-  issues: Array<IRedmineIssue>,
+  issues: IRedmineIssues,
   date: Dayjs,
   loggedHour: number
 ): string {
@@ -222,7 +222,7 @@ export function getLogTimeMessage(
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": "*Date:*\t\t{{ date }}\n*Logged:*\t{{ hour }} hours"
+          "text": "*Date:*\\t\\t{{ date }}\\n*Logged:*\\t{{ hour }} hours"
         }
       },
       {
@@ -239,10 +239,10 @@ export function getLogTimeMessage(
       {
         "type": "actions",
         "elements": [
-          {% if logHour >= 8 %}
+          {% if remainHour >= 8 %}
           {
             "type": "button",
-            "action_id": "{{ action }}",
+            "action_id": "{{ action.log }}",
             "text": {
               "type": "plain_text",
               "emoji": true,
@@ -273,7 +273,7 @@ export function getLogTimeMessage(
           {% if remainHour >= 4 %}
           {
             "type": "button",
-            "action_id": "{{ action }}",
+            "action_id": "{{ action.log }}__1",
             "text": {
               "type": "plain_text",
               "text": "4h"
@@ -302,7 +302,7 @@ export function getLogTimeMessage(
           {% if remainHour >= 2 %}
           {
             "type": "button",
-            "action_id": "{{ action }}",
+            "action_id": "{{ action.log }}__2",
             "text": {
               "type": "plain_text",
               "text": "2h"
@@ -339,6 +339,7 @@ export function getLogTimeMessage(
         "elements": [
         {
           "type": "button",
+          "action_id": "{{ action.close }}",
           "text": {
             "type": "plain_text",
             "text": "Close"
@@ -370,11 +371,11 @@ export function getLogTimeMessage(
     `,
     {
       config: userConfig,
-      issues: issues,
+      issues: issues.issues,
       date: logDate,
       hour: loggedHour,
       remainHour: configs.WORK_HOURS - loggedHour,
-      action: actions.LOG,
+      action: { log: actions.LOG, close: actions.CLOSE },
     }
   );
 }

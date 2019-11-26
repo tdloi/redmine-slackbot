@@ -17,7 +17,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   if (body.type === 'block_actions') {
     const payload: IBlockActionsPayload = body;
-    switch (payload.actions[0].action_id) {
+    let action = payload.actions[0].action_id;
+    action = action.split('__')[0];
+    switch (action) {
       case actions.CLOSE:
         // can't delete ephemeral message via delete api
         await fetch(payload.response_url, {
