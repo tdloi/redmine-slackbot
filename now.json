@@ -8,6 +8,7 @@
         "SLACK_SIGNING_SECRET": "@slack-signing-secret",
         "REDMINE_URL": "@redmine-url",
         "WORK_HOURS": "@work-hours",
-        "TIMEZONE": "@timezone"
+        "TIMEZONE": "@timezone",
+        "SECRET": "@secret"
     }
 }

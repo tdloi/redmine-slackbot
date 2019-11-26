@@ -14,4 +14,5 @@ export const configs = {
   REDMINE_URL: process.env.REDMINE_URL,
   WORK_HOURS: parseInt(process.env.WORK_HOURS),
   TIMEZONE: parseInt(process.env.TIME_ZONE), // e.g: 7 or -7
+  SECRET: process.env.SECRET,
 };

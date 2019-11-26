@@ -20,7 +20,7 @@ export function getConfigMessage(userConfig: IUserConfig): string {
           ,
           { "type": "mrkdwn", "text": "*Userid:* {{ userConfig.userId }}"},
           { "type": "mrkdwn", "text": "*Show confirm box:* {{ userConfig.showConfirm }}"},
-          { "type": "mrkdwn", "text": "*Token:* {{ atoa(userConfig.token) }}"},
+          { "type": "mrkdwn", "text": "*Token:* {{ Buffer.from(userConfig.token, 'base64').toString('ascii') }}"},
           { "type": "mrkdwn", "text": "*Include closed issue:* {{ userConfig.includeClosed }}"}
           {% endif %}
         ]

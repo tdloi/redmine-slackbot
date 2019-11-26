@@ -4,7 +4,7 @@ import { configs } from './_settings';
 
 export async function getIssues(
   userConfig: IUserConfig | null,
-  token: string | null
+  token: string | null = null
 ): Promise<Array<IRedmineIssue> | null> {
   let status = '*';
   if (userConfig && userConfig.includeClosed) {
