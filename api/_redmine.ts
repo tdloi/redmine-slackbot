@@ -7,6 +7,10 @@ export async function getIssues(
   userConfig: IUserConfig | null,
   token: string | null = null
 ): Promise<IRedmineIssues | null> {
+  if (token == null && userConfig == null) {
+    throw new Error("Both userConfig and Token can't be null");
+  }
+
   let status = '*';
   if (userConfig && userConfig.includeClosed) {
     status = 'open';
