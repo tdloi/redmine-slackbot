@@ -36,3 +36,11 @@ export async function getUserConfig(userId: string): Promise<IUserConfig> {
   const db = await getDb();
   return db.collection('configs').findOne({ _type: 'userConfig', userId: userId } as IUserConfig);
 }
+
+export async function getUsersConfig(): Promise<Array<IUserConfig>> {
+  const db = await getDb();
+  return db
+    .collection('configs')
+    .find({ _type: 'userConfig' })
+    .toArray();
+}
