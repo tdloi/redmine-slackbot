@@ -16,6 +16,7 @@ Before you start: Copy `.env.example` to `.env`, replace following value with yo
 - OAuth and permissions: `bot`, `channels:read`, `chat:write:bot`, `commands`
 - Replace value of `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in **.env**
 - Install app to your workspace
+- Go to your slack workspace at: `your-team.slack.com`, it will redirect you to `https://app.slack.com/client/YOUR_TEAM_ID`, replace `SLACK_TEAM_ID` in .env with your id
 
 ## MongoDB
 You can create a free database from [mlab](https://mlab.com/) or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Copy connection uri to value of `MONGODB_URI` in **.env**
