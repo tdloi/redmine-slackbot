@@ -6,7 +6,7 @@ import { Dayjs } from 'dayjs';
 nunjucks.configure({ autoescape: true });
 
 export function getConfigMessage(userConfig: IUserConfig): string {
-  const token = Buffer.from(userConfig.token, 'base64').toString('ascii');
+  const token = userConfig ? Buffer.from(userConfig.token, 'base64').toString('ascii') : '';
   return nunjucks.renderString(
     `
   {
@@ -49,9 +49,35 @@ export function getConfigMessage(userConfig: IUserConfig): string {
           {
             "type": "button",
             "text": { "type": "plain_text", "text": "Close", "emoji": true },
-            "style": "danger",
             "action_id": "{{ actions.close }}"
           }
+          {% if userConfig !== null %}
+          ,          
+          {
+            "type": "button",
+            "text": { "type": "plain_text", "text": "Delete", "emoji": true },
+            "style": "danger",
+            "action_id": "{{ actions.delete }}",
+            "confirm": {
+              "title": {
+                "type": "plain_text",
+                "text": "Are you sure?"
+              },
+              "text": {
+                "type": "mrkdwn",
+                "text": "Do you want to delete your config?"
+              },
+              "confirm": {
+                "type": "plain_text",
+                "text": "Do it"
+              },
+              "deny": {
+                "type": "plain_text",
+                "text": "Stop, I've changed my mind!"
+              }
+            }
+          }
+          {% endif %}
         ]
       }
     ]
@@ -63,7 +89,7 @@ export function getConfigMessage(userConfig: IUserConfig): string {
       url: configs.REDMINE_URL,
       workHours: configs.WORK_HOURS,
       timezone: configs.TIMEZONE,
-      actions: { edit: actions.CONFIG, close: actions.CLOSE },
+      actions: { edit: actions.CONFIG, close: actions.CLOSE, delete: actions.DELETE },
     }
   );
 }

@@ -52,6 +52,14 @@ export async function setUserConfig(userId: string, payload: IUserConfig): Promi
   return result.matchedCount === 1 || result.upsertedCount === 1 || result.modifiedCount === 1;
 }
 
+export async function deleteUserConfig(userId: string): Promise<boolean> {
+  const db = await getDb();
+  const result = await db
+    .collection(configs.COLLECTION)
+    .deleteOne({ _type: 'userConfig', userId: userId });
+  return result.deletedCount === 1;
+}
+
 export async function getUsersConfig(): Promise<Array<IUserConfig>> {
   const db = await getDb();
   return db

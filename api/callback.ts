@@ -10,7 +10,7 @@ import {
 } from './_interface';
 import { getModalConfigMessage, getConfigMessage } from './_messages';
 import { getIssues } from './_redmine';
-import { setUserConfig, getUserConfig } from './_mongo';
+import { setUserConfig, getUserConfig, deleteUserConfig } from './_mongo';
 
 export default async (req: NowRequest, res: NowResponse) => {
   // https://api.slack.com/interactivity/handling#payloads
@@ -21,6 +21,8 @@ export default async (req: NowRequest, res: NowResponse) => {
     let action = payload.actions[0].action_id;
     action = action.split('__')[0];
     switch (action) {
+      case actions.DELETE:
+        await deleteUserConfig(payload.user.id);
       case actions.CLOSE:
         // can't delete ephemeral message via delete api
         await slackApi(payload.response_url, {
