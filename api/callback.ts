@@ -21,6 +21,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   if (body.type === 'block_actions') {
     const payload: IBlockActionsPayload = body;
+    const config = await getUserConfig(payload.user.id);
 
     let action = payload.actions[0].action_id;
     action = action.split('__')[0];
@@ -42,8 +43,17 @@ export default async (req: NowRequest, res: NowResponse) => {
           view: JSON.parse(getModalConfigMessage(null, payload.response_url)),
         } as ViewsOpenArguments);
         return res.status(200).send(null);
+      case actions.PAGINATE:
+        const offset = Object.values(payload.actions)[0].value;
+        const messages = await getLogtimeMessagePayload(config, parseInt(offset));
+        await slackApi(payload.response_url, {
+          response_type: 'ephemeral',
+          replace_original: true,
+          text: messages.text,
+          blocks: messages.blocks,
+        });
+        return res.status(200).send(null);
       case actions.LOG:
-        const config = await getUserConfig(payload.user.id);
         // const [issueId, hour] = Object.values(payload.actions)[0].value.split('__');
         // const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
         // await logTime(config, date, parseInt(hour), parseInt(issueId));

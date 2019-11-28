@@ -3,6 +3,7 @@ export const actions = {
   DELETE: 'delete_config',
   CLOSE: 'delete_message',
   LOG: 'log_time',
+  PAGINATE: 'paginate',
 };
 
 export const configs = {

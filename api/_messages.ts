@@ -47,7 +47,7 @@ export function getConfigMessage(userConfig: IUserConfig): string {
       {
         "type": "actions",
         "elements": [
-          { "type": "button", 
+          { "type": "button",
             "text": { "type": "plain_text", "text": "Edit", "emoji": true },
             "style": "primary",
             "action_id": "{{ actions.edit }}"
@@ -58,7 +58,7 @@ export function getConfigMessage(userConfig: IUserConfig): string {
             "action_id": "{{ actions.close }}"
           }
           {% if userConfig !== null %}
-          ,          
+          ,
           {
             "type": "button",
             "text": { "type": "plain_text", "text": "Delete", "emoji": true },
@@ -282,6 +282,8 @@ export function getLogTimeMessage(
   loggedHour: number
 ): string {
   const logDate = date.format('DD/MM/YYYY');
+  const prev = issues.offset - 5;
+  const next = issues.offset + 5;
   return nunjucks.renderString(
     `
     [
@@ -295,7 +297,7 @@ export function getLogTimeMessage(
       {
         "type": "divider"
       },
-      {% for issue in issues %}
+      {% for issue in issues.issues %}
       {
         "type": "section",
         "text": {
@@ -309,7 +311,7 @@ export function getLogTimeMessage(
           {% if remainHour >= 8 %}
           {
             "type": "button",
-            "action_id": "{{ action.log }}",
+            "action_id": "{{ actions.log }}__8",
             "text": {
               "type": "plain_text",
               "emoji": true,
@@ -340,7 +342,7 @@ export function getLogTimeMessage(
           {% if remainHour >= 4 %}
           {
             "type": "button",
-            "action_id": "{{ action.log }}__1",
+            "action_id": "{{ actions.log }}__4",
             "text": {
               "type": "plain_text",
               "text": "4h"
@@ -369,12 +371,41 @@ export function getLogTimeMessage(
           {% if remainHour >= 2 %}
           {
             "type": "button",
-            "action_id": "{{ action.log }}__2",
+            "action_id": "{{ actions.log }}__2",
             "text": {
               "type": "plain_text",
               "text": "2h"
             },
             "value": "{{ issue.id }}__2",
+            "confirm": {
+              "title": {
+                "type": "plain_text",
+                "text": "Are you sure?"
+              },
+              "text": {
+                "type": "mrkdwn",
+                "text": "You can't change once logged"
+              },
+              "confirm": {
+                "type": "plain_text",
+                "text": "Do it"
+              },
+              "deny": {
+                "type": "plain_text",
+                "text": "Stop, I've changed my mind!"
+              }
+            }
+          },
+          {% endif %}
+          {% if remainHour >= 1 %}
+          {
+            "type": "button",
+            "action_id": "{{ actions.log }}__1",
+            "text": {
+              "type": "plain_text",
+              "text": "1h"
+            },
+            "value": "{{ issue.id }}__1",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -400,20 +431,43 @@ export function getLogTimeMessage(
       {% endfor %}
       {
         "type": "divider"
-      },          
+      },
       {
         "type": "actions",
         "elements": [
-        {
-          "type": "button",
-          "action_id": "{{ action.close }}",
-          "text": {
-            "type": "plain_text",
-            "text": "Close"
+          {% if pagination.prev >= 0 %}
+          {
+            "type": "button",
+            "action_id": "{{ actions.paginate }}__0",
+            "text": {
+              "type": "plain_text",
+              "text": "Previous issue"
+            },
+            "value": "{{ pagination.prev }}"
           },
-          "style": "danger",
-          "value": "0",
-                  "confirm": {
+          {% endif %}
+          {% if pagination.next < issues.total_count %}
+          {
+            "type": "button",
+            "action_id": "{{ actions.paginate }}__1",
+            "text": {
+              "type": "plain_text",
+              "text": "Next issue"
+            },
+            "style": "primary",
+            "value": "{{ pagination.next }}"
+          },				
+          {% endif %}
+          {
+            "type": "button",
+            "action_id": "{{ actions.close }}",
+            "text": {
+              "type": "plain_text",
+              "text": "Close"
+            },
+            "style": "danger",
+            "value": " ",
+            "confirm": {
               "title": {
                 "type": "plain_text",
                 "text": "Are you sure?"
@@ -431,18 +485,19 @@ export function getLogTimeMessage(
                 "text": "Exit"
               }
             }
-        }
+          }
         ]
       }
     ]
     `,
     {
       config: userConfig,
-      issues: issues.issues,
+      issues: issues,
       date: logDate,
       hour: loggedHour,
       remainHour: configs.WORK_HOURS - loggedHour,
-      action: { log: actions.LOG, close: actions.CLOSE },
+      actions: { log: actions.LOG, close: actions.CLOSE, paginate: actions.PAGINATE },
+      pagination: { prev: prev, next: next },
     }
   );
 }

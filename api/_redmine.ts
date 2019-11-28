@@ -5,14 +5,15 @@ import { Dayjs } from 'dayjs';
 
 export async function getIssues(
   userConfig: IUserConfig | null,
-  token: string | null = null
+  token: string | null = null,
+  offset: number = 0
 ): Promise<IRedmineIssues | null> {
   if (token == null && userConfig == null) {
     throw new Error("Both userConfig and Token can't be null");
   }
 
   let status = '*';
-  if (userConfig && userConfig.includeClosed) {
+  if (userConfig && userConfig.includeClosed === false) {
     status = 'open';
   }
   if (userConfig && userConfig.token) {
@@ -20,7 +21,7 @@ export async function getIssues(
   }
 
   const issues: IRedmineIssues = await fetch(
-    `${configs.REDMINE_URL}/issues.json?assigned_to_id=me&status_id=${status}&limit=5`,
+    `${configs.REDMINE_URL}/issues.json?assigned_to_id=me&status_id=${status}&limit=5&offset=${offset}`,
     {
       headers: {
         'X-Redmine-API-Key': token,

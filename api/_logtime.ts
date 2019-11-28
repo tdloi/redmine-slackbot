@@ -6,9 +6,10 @@ import { configs } from './_settings';
 import { getLogTimeMessage } from './_messages';
 
 export async function getLogtimeMessagePayload(
-  config: IUserConfig
+  config: IUserConfig,
+  offset: number = 0
 ): Promise<ChatPostMessageArguments> {
-  const issues = await getIssues(config);
+  const issues = await getIssues(config, null, offset);
   const logged = await getLoggedHours(config, dayjs());
   if (logged >= configs.WORK_HOURS) {
     return {
