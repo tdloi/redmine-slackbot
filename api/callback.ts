@@ -9,7 +9,7 @@ import {
   ISlackAPIPayload,
 } from './_interface';
 import { getModalConfigMessage, getConfigMessage } from './_messages';
-import { getIssues } from './_redmine';
+import { getIssues, logTime } from './_redmine';
 import { setUserConfig, getUserConfig, deleteUserConfig } from './_mongo';
 import dayjs from 'dayjs';
 import { getCurrentTimeZoneDate, encode } from './_utils';
@@ -54,9 +54,9 @@ export default async (req: NowRequest, res: NowResponse) => {
         });
         return res.status(200).send(null);
       case actions.LOG:
-        // const [issueId, hour] = Object.values(payload.actions)[0].value.split('__');
-        // const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
-        // await logTime(config, date, parseInt(hour), parseInt(issueId));
+        const [issueId, hour] = Object.values(payload.actions)[0].value.split('__');
+        const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
+        await logTime(config, date, parseInt(hour), parseInt(issueId));
 
         const logtimeMessage = await getLogtimeMessagePayload(config);
         await slackApi(payload.response_url, {

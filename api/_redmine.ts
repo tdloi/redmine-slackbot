@@ -59,9 +59,10 @@ export async function logTime(
   issue_id: number
 ) {
   const logDate = date.format('YYYY-MM-DD');
-  await fetch(`${configs.REDMINE_URL}/time_entries.json`, {
+  return await fetch(`${configs.REDMINE_URL}/time_entries.json`, {
     method: 'POST',
     headers: {
+      'Content-Type': 'application/json',
       'X-Redmine-API-Key': decode(userConfig.token),
     },
     body: JSON.stringify({
@@ -73,5 +74,5 @@ export async function logTime(
       },
       issue_id: issue_id,
     }),
-  });
+  }).then(res => res.json());
 }
