@@ -15,6 +15,7 @@ export async function getLogtimeMessagePayload(
       channel: config.userId,
       as_user: true,
       text: `Logged ${logged} / ${configs.WORK_HOURS} hours`,
+      blocks: [],
     };
   }
 

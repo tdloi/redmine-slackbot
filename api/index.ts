@@ -23,7 +23,7 @@ export default async (req: NowRequest, res: NowResponse) => {
       }
 
       const logtimeMessage = await getLogtimeMessagePayload(userConfig);
-      if (!logtimeMessage.blocks) {
+      if (logtimeMessage.blocks.length === 0) {
         return res.status(200).json({ text: logtimeMessage.text });
       }
       return res.status(200).json({ blocks: logtimeMessage.blocks });
