@@ -6,6 +6,7 @@ import { slack } from './_slack';
 import { ChatPostMessageArguments } from '@slack/web-api';
 import { IUserConfig } from './_interface';
 import { getLogTimeMessage } from './_messages';
+import { getCurrentTimeZoneDate } from './_utils';
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send(null);
@@ -25,7 +26,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   await slack.chat.postMessage({
     channel: config.userId,
     as_user: true,
-    blocks: JSON.parse(getLogTimeMessage(config, issues, dayjs(), logged)),
+    blocks: JSON.parse(getLogTimeMessage(config, issues, getCurrentTimeZoneDate(dayjs()), logged)),
   } as ChatPostMessageArguments);
   return res.status(200).send(null);
 };
