@@ -1,9 +1,8 @@
 import { NowRequest, NowResponse } from '@now/node';
 import { ViewsOpenArguments } from '@slack/web-api';
-import { isSlackRequest, slack } from './_slack';
+import { isSlackRequest, slack, slackApi } from './_slack';
 import { actions } from './_settings';
 import { IBlockActionsPayload } from './_interface';
-import fetch from 'node-fetch';
 import { getModalConfigMessage } from './_messages';
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -22,17 +21,11 @@ export default async (req: NowRequest, res: NowResponse) => {
     switch (action) {
       case actions.CLOSE:
         // can't delete ephemeral message via delete api
-        await fetch(payload.response_url, {
-          method: 'POST',
-          body: JSON.stringify({
-            response_type: 'ephemeral',
-            replace_original: true,
-            delete_original: true,
-            blocks: [],
-          }),
-          headers: {
-            Authorization: 'Bearer ' + process.env.SLACK_BOT_TOKEN,
-          },
+        await slackApi(payload.response_url, {
+          response_type: 'ephemeral',
+          replace_original: true,
+          delete_original: true,
+          blocks: [],
         });
         return res.status(200).send(null);
       case actions.CONFIG:
@@ -44,10 +37,8 @@ export default async (req: NowRequest, res: NowResponse) => {
       case actions.LOG:
         return;
       default:
-        break;
+        return res.status(400).send(null);
     }
   } else if (body.type === 'view_submission') {
   }
-
-  res.status(200).send(null);
 };
