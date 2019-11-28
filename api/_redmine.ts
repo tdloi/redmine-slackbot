@@ -49,3 +49,27 @@ export async function getLoggedHours(userConfig: IUserConfig, date: Dayjs): Prom
   const total = timeEntries.reduce((accumulator, curr) => accumulator + curr.hours, 0);
   return total;
 }
+
+export async function logTime(
+  userConfig: IUserConfig,
+  date: Dayjs,
+  hour: number,
+  issue_id: number
+) {
+  const logDate = date.format('YYYY-MM-DD');
+  await fetch(`${configs.REDMINE_URL}/time_entries.json`, {
+    method: 'POST',
+    headers: {
+      'X-Redmine-API-Key': Buffer.from(userConfig.token, 'base64').toString('ascii'),
+    },
+    body: JSON.stringify({
+      time_entry: {
+        hours: hour,
+        comments: userConfig.comment,
+        activity_id: configs.REDMINE_NORMAL_HOUR_ID,
+        spent_on: logDate,
+      },
+      issue_id: issue_id,
+    }),
+  });
+}

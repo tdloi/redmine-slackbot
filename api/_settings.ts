@@ -15,6 +15,7 @@ export const configs = {
   // DOES NOT include trailing slash
   // e.g: https://example.com
   REDMINE_URL: process.env.REDMINE_URL,
+  REDMINE_NORMAL_HOUR_ID: parseInt(process.env.REDMINE_NORMAL_HOUR_ID),
   WORK_HOURS: parseInt(process.env.WORK_HOURS),
   TIMEZONE: parseInt(process.env.TIMEZONE), // e.g: 7 or -7
   SECRET: process.env.SECRET,
