@@ -11,6 +11,9 @@ import {
 import { getModalConfigMessage, getConfigMessage } from './_messages';
 import { getIssues } from './_redmine';
 import { setUserConfig, getUserConfig, deleteUserConfig } from './_mongo';
+import dayjs from 'dayjs';
+import { getCurrentTimeZoneDate } from './_utils';
+import { getLogtimeMessagePayload } from './_logtime';
 
 export default async (req: NowRequest, res: NowResponse) => {
   // https://api.slack.com/interactivity/handling#payloads
@@ -18,6 +21,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   if (body.type === 'block_actions') {
     const payload: IBlockActionsPayload = body;
+
     let action = payload.actions[0].action_id;
     action = action.split('__')[0];
     switch (action) {
@@ -39,7 +43,19 @@ export default async (req: NowRequest, res: NowResponse) => {
         } as ViewsOpenArguments);
         return res.status(200).send(null);
       case actions.LOG:
-        return;
+        const config = await getUserConfig(payload.user.id);
+        // const [issueId, hour] = Object.values(payload.actions)[0].value.split('__');
+        // const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
+        // await logTime(config, date, parseInt(hour), parseInt(issueId));
+
+        const logtimeMessage = await getLogtimeMessagePayload(config);
+        await slackApi(payload.response_url, {
+          response_type: 'ephemeral',
+          replace_original: true,
+          text: logtimeMessage.text,
+          blocks: logtimeMessage.blocks,
+        });
+        return res.status(200).send(null);
       default:
         return res.status(400).send(null);
     }

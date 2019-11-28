@@ -78,6 +78,7 @@ interface IBlockAction {
     text: string;
     emoji: boolean;
   };
+  value: string;
   type: 'button';
   action_ts: string;
 }

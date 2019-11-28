@@ -316,7 +316,7 @@ export function getLogTimeMessage(
               "text": "8h"
             },
             "style": "primary",
-            "value": "8",
+            "value": "{{ issue.id }}__8",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -345,7 +345,7 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "4h"
             },
-            "value": "4",
+            "value": "{{ issue.id }}__4",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -374,7 +374,7 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "2h"
             },
-            "value": "2",
+            "value": "{{ issue.id }}__2",
             "confirm": {
               "title": {
                 "type": "plain_text",
