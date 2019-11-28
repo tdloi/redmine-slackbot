@@ -12,7 +12,7 @@ import { getModalConfigMessage, getConfigMessage } from './_messages';
 import { getIssues } from './_redmine';
 import { setUserConfig, getUserConfig, deleteUserConfig } from './_mongo';
 import dayjs from 'dayjs';
-import { getCurrentTimeZoneDate } from './_utils';
+import { getCurrentTimeZoneDate, encode } from './_utils';
 import { getLogtimeMessagePayload } from './_logtime';
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -89,7 +89,7 @@ export default async (req: NowRequest, res: NowResponse) => {
       _type: 'userConfig',
       userId: payload.user.id,
       displayName: payload.user.name,
-      token: Buffer.from(Object.values(values.token)[0].value).toString('base64'),
+      token: encode(Object.values(values.token)[0].value),
       comment: Object.values(values.comment)[0].value,
       remindAt: parseInt(Object.values(values.remindAt)[0].selected_option.value),
       showConfirm: Object.values(values.showConfirm)[0].selected_option.value === 'true',

@@ -2,11 +2,12 @@ import nunjucks from 'nunjucks';
 import { IUserConfig, IRedmineIssues } from './_interface';
 import { actions, configs } from './_settings';
 import { Dayjs } from 'dayjs';
+import { decode } from './_utils';
 
 nunjucks.configure({ autoescape: true });
 
 export function getConfigMessage(userConfig: IUserConfig): string {
-  const token = userConfig ? Buffer.from(userConfig.token, 'base64').toString('ascii') : '';
+  const token = userConfig ? decode(userConfig.token) : '';
   return nunjucks.renderString(
     `
   {

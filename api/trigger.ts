@@ -6,11 +6,11 @@ import { ChatPostMessageArguments } from '@slack/web-api';
 import { getLogtimeMessagePayload } from './_logtime';
 import { slack } from './_slack';
 import { IUserConfig } from './_interface';
-import { getCurrentTimeZoneDate } from './_utils';
+import { getCurrentTimeZoneDate, encode } from './_utils';
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send(null);
-  if (req.headers.authorization !== `Basic ${Buffer.from(configs.AUTH_CRE).toString('base64')}`) {
+  if (req.headers.authorization !== `Basic ${encode(configs.AUTH_CRE)}`) {
     return res.status(401).send(null);
   }
 

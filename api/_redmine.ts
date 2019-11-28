@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { IUserConfig, IRedmineTimeEntries, IRedmineIssues } from './_interface';
 import { configs } from './_settings';
 import { Dayjs } from 'dayjs';
+import { decode } from './_utils';
 
 export async function getIssues(
   userConfig: IUserConfig | null,
@@ -17,7 +18,7 @@ export async function getIssues(
     status = 'open';
   }
   if (userConfig && userConfig.token) {
-    token = Buffer.from(userConfig.token, 'base64').toString('ascii');
+    token = decode(userConfig.token);
   }
 
   const issues: IRedmineIssues = await fetch(
@@ -40,7 +41,7 @@ export async function getLoggedHours(userConfig: IUserConfig, date: Dayjs): Prom
     `${configs.REDMINE_URL}/time_entries.json?user_id=me&from=${loggedDate}&to=${loggedDate}`,
     {
       headers: {
-        'X-Redmine-API-Key': Buffer.from(userConfig.token, 'base64').toString('ascii'),
+        'X-Redmine-API-Key': decode(userConfig.token),
       },
     }
   )
@@ -61,7 +62,7 @@ export async function logTime(
   await fetch(`${configs.REDMINE_URL}/time_entries.json`, {
     method: 'POST',
     headers: {
-      'X-Redmine-API-Key': Buffer.from(userConfig.token, 'base64').toString('ascii'),
+      'X-Redmine-API-Key': decode(userConfig.token),
     },
     body: JSON.stringify({
       time_entry: {
