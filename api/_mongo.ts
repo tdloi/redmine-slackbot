@@ -1,6 +1,7 @@
 import url from 'url';
 import { MongoClient, Db } from 'mongodb';
 import { IGlobalConfig, IUserConfig } from './_interface';
+import { configs } from './_settings';
 // Create cached connection variable
 let cachedDb = null;
 
@@ -29,18 +30,30 @@ export async function getDb(): Promise<Db> {
 
 export async function getGlobalConfig(): Promise<IGlobalConfig> {
   const db = await getDb();
-  return db.collection('configs').findOne({ _type: 'globalConfig' });
+  return db.collection(configs.COLLECTION).findOne({ _type: 'globalConfig' });
 }
 
 export async function getUserConfig(userId: string): Promise<IUserConfig> {
   const db = await getDb();
-  return db.collection('configs').findOne({ _type: 'userConfig', userId: userId } as IUserConfig);
+  return db
+    .collection(configs.COLLECTION)
+    .findOne({ _type: 'userConfig', userId: userId } as IUserConfig);
+}
+
+export async function setUserConfig(userId: string, payload: IUserConfig): Promise<boolean> {
+  const db = await getDb();
+  const result = await db
+    .collection(configs.COLLECTION)
+    .updateOne({ _type: 'userConfig', userId: userId }, payload, {
+      upsert: true,
+    });
+  return result.matchedCount === 1 || result.upsertedCount === 1 || result.modifiedCount === 1;
 }
 
 export async function getUsersConfig(): Promise<Array<IUserConfig>> {
   const db = await getDb();
   return db
-    .collection('configs')
+    .collection(configs.COLLECTION)
     .find({ _type: 'userConfig' })
     .toArray();
 }
