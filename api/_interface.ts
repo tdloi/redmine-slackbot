@@ -1,5 +1,4 @@
-import { WebAPICallResult } from '@slack/web-api';
-import { NowRequest } from '@now/node';
+import { WebAPICallResult, View, Block } from '@slack/web-api';
 
 export interface IGlobalConfig {
   excludesDate: Array<string>; // day to exclude
@@ -9,6 +8,7 @@ export interface IUserConfig {
   _type: 'userConfig';
   token: string;
   userId: string;
+  displayName: string;
   showConfirm: boolean;
   includeClosed: boolean;
   remindAt: number; // Which hour to remind, 24h format
@@ -55,7 +55,7 @@ export interface IChatPostMessageResult extends WebAPICallResult {
 }
 
 // https://api.slack.com/interactivity/slash-commands#responding_to_commands#app_command_handling
-export interface ISlashCommandPayload extends NowRequest {
+export interface ISlashCommandPayload {
   token: string;
   team_id: string;
   team_domain: string;
@@ -82,7 +82,7 @@ interface IBlockAction {
 }
 
 // https://api.slack.com/reference/interaction-payloads/block-actions
-export interface IBlockActionsPayload extends NowRequest {
+export interface IBlockActionsPayload {
   type: 'block_actions';
   team: {
     id: string;
@@ -109,4 +109,69 @@ export interface IBlockActionsPayload extends NowRequest {
   };
   response_url: string;
   actions: Array<IBlockAction>;
+}
+
+export interface ISlackAPIPayload {
+  response_type?: 'ephemeral' | 'in_channel';
+  replace_original: boolean;
+  delete_original?: boolean;
+  text?: string;
+  blocks: any;
+}
+
+export interface ISlackAPIModalPayload {
+  response_action: 'update';
+  view: View;
+}
+
+export interface IViewSubmissionPayload {
+  type: 'view_submission';
+  team: {
+    id: string;
+    domain: string;
+  };
+  user: {
+    id: string;
+    username: string;
+    name: string;
+    team_id: string;
+  };
+  api_app_id: string;
+  token: string;
+  trigger_id: string;
+  view: {
+    id: string;
+    team_id: string;
+    type: 'modal';
+    hash: string;
+    private_metadata: string;
+    state: {
+      values: {
+        token: {
+          [key: string]: {
+            type: 'plain_text_input';
+            value: string;
+          };
+        };
+        remindAt: {
+          [key: string]: {
+            type: 'static_select';
+            selected_option: { value: string };
+          };
+        };
+        showConfirm: {
+          [key: string]: {
+            type: 'static_select';
+            selected_option: { value: 'true' | 'false' };
+          };
+        };
+        includeClosed: {
+          [key: string]: {
+            type: 'static_select';
+            selected_option: { value: 'true' | 'false' };
+          };
+        };
+      };
+    };
+  };
 }

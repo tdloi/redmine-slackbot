@@ -42,11 +42,13 @@ export async function getUserConfig(userId: string): Promise<IUserConfig> {
 
 export async function setUserConfig(userId: string, payload: IUserConfig): Promise<boolean> {
   const db = await getDb();
-  const result = await db
-    .collection(configs.COLLECTION)
-    .updateOne({ _type: 'userConfig', userId: userId }, payload, {
+  const result = await db.collection(configs.COLLECTION).updateOne(
+    { _type: 'userConfig', userId: userId },
+    { $set: payload },
+    {
       upsert: true,
-    });
+    }
+  );
   return result.matchedCount === 1 || result.upsertedCount === 1 || result.modifiedCount === 1;
 }
 

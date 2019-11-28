@@ -6,6 +6,7 @@ import { Dayjs } from 'dayjs';
 nunjucks.configure({ autoescape: true });
 
 export function getConfigMessage(userConfig: IUserConfig): string {
+  const token = Buffer.from(userConfig.token, 'base64').toString('ascii');
   return nunjucks.renderString(
     `
   {
@@ -19,9 +20,11 @@ export function getConfigMessage(userConfig: IUserConfig): string {
           { "type": "mrkdwn", "text": "*Timezone:* {{ timezone }}"}
           {% if userConfig !== null %}
           ,
-          { "type": "mrkdwn", "text": "*Userid:* {{ userConfig.userId }}"},
+          { "type": "mrkdwn", "text": "*User:* {{ userConfig.displayName }}"},
+          { "type": "mrkdwn", "text": " "},
+          { "type": "mrkdwn", "text": "*Token:* {{ token }}******"},
+          { "type": "mrkdwn", "text": "*Remind at:* {{ userConfig.remindAt }} "},
           { "type": "mrkdwn", "text": "*Show confirm box:* {{ userConfig.showConfirm }}"},
-          { "type": "mrkdwn", "text": "*Token:* {{ Buffer.from(userConfig.token, 'base64').toString('ascii') }}"},
           { "type": "mrkdwn", "text": "*Include closed issue:* {{ userConfig.includeClosed }}"}
           {% endif %}
         ]
@@ -56,6 +59,7 @@ export function getConfigMessage(userConfig: IUserConfig): string {
   `,
     {
       userConfig: userConfig,
+      token: token.substr(0, 5),
       url: configs.REDMINE_URL,
       workHours: configs.WORK_HOURS,
       timezone: configs.TIMEZONE,
@@ -64,10 +68,31 @@ export function getConfigMessage(userConfig: IUserConfig): string {
   );
 }
 
-export function getModalConfigMessage(error_message: string = null): string {
+export function getModalConfigMessage(
+  error_message: string = null,
+  response_url: string = ''
+): string {
   return nunjucks.renderString(
     `
-    [
+    {
+    "type": "modal",
+    "private_metadata": "{\\"response_url\\": \\"{{ message.url }}\\"}",
+    "title": {
+      "type": "plain_text",
+      "text": "Redmine bot",
+      "emoji": true
+    },
+    "submit": {
+      "type": "plain_text",
+      "text": "Submit",
+      "emoji": true
+    },
+    "close": {
+      "type": "plain_text",
+      "text": "Cancel",
+      "emoji": true
+    },
+    "blocks": [
       {% if error %}
       {
         "type": "section",
@@ -81,7 +106,11 @@ export function getModalConfigMessage(error_message: string = null): string {
         "type": "input",
         "block_id": "token",
         "element": {
-          "type": "plain_text_input"
+          "type": "plain_text_input",
+          "placeholder": {
+            "type": "plain_text",
+            "text": "Your Redmine API access token"
+          }
         },
         "label": {
           "type": "plain_text",
@@ -94,7 +123,7 @@ export function getModalConfigMessage(error_message: string = null): string {
       },
       {
         "type": "input",
-        "block_id": "hour",
+        "block_id": "remindAt",
         "element": {
           "type": "static_select",
           "placeholder": {
@@ -103,7 +132,7 @@ export function getModalConfigMessage(error_message: string = null): string {
             "emoji": true
           },
           "options": [
-            {% for i in range(9, 19) %}
+            {% for i in range(7, 19) %}
             {
               "text": {
                 "type": "plain_text",
@@ -129,20 +158,20 @@ export function getModalConfigMessage(error_message: string = null): string {
           "type": "static_select",
           "placeholder": {
             "type": "plain_text",
-            "text": "Include closed issues",
+            "text": "Include closed issues"
           },
           "options": [
             {
               "text": {
                 "type": "plain_text",
-                "text": "Yes",
+                "text": "Yes"
               },
               "value": "true"
             },
             {
               "text": {
                 "type": "plain_text",
-                "text": "No",
+                "text": "No"
               },
               "value": "false"
             }
@@ -155,26 +184,13 @@ export function getModalConfigMessage(error_message: string = null): string {
         }
       },
       {
-        "type": "section",
-        "block_id": "confirm",
-        "fields": [
-          {
-            "type": "mrkdwn",
+        "type": "input",
+        "block_id": "showConfirm",
+        "element": {
+          "type": "static_select",
+          "placeholder": {
+            "type": "plain_text",
             "text": "Show confirm dialog"
-          }
-        ],
-        "accessory": {
-          "type": "radio_buttons",
-          "initial_option": {
-            "text": {
-              "type": "plain_text",
-              "text": "Yes"
-            },
-            "value": "true",
-            "description": {
-              "type": "plain_text",
-              "text": "Show each time click on logtime"
-            }
           },
           "options": [
             {
@@ -182,29 +198,33 @@ export function getModalConfigMessage(error_message: string = null): string {
                 "type": "plain_text",
                 "text": "Yes"
               },
-              "value": "true",
-              "description": {
-                "type": "plain_text",
-                "text": "Show each time click on logtime"
-              }
+              "value": "true"
             },
             {
               "text": {
                 "type": "plain_text",
                 "text": "No"
               },
-              "value": "false",
-              "description": {
-                "type": "plain_text",
-                "text": "Don't show"
-              }
+              "value": "false"
             }
           ]
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Show confirm dialog"
+        },
+        "hint": {
+          "type": "plain_text",
+          "text": "Show confirm dialog each time click logtime"
         }
       }
-    ]
+    ]}
     `,
-    { url: configs.REDMINE_URL, error: error_message }
+    {
+      url: configs.REDMINE_URL,
+      error: error_message,
+      message: { url: response_url },
+    }
   );
 }
 
