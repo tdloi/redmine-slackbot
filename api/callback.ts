@@ -64,6 +64,7 @@ export default async (req: NowRequest, res: NowResponse) => {
       userId: payload.user.id,
       displayName: payload.user.name,
       token: Buffer.from(Object.values(values.token)[0].value).toString('base64'),
+      comment: Object.values(values.comment)[0].value,
       remindAt: parseInt(Object.values(values.remindAt)[0].selected_option.value),
       showConfirm: Object.values(values.showConfirm)[0].selected_option.value === 'true',
       includeClosed: Object.values(values.includeClosed)[0].selected_option.value === 'true',

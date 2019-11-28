@@ -18,17 +18,23 @@ export function getConfigMessage(userConfig: IUserConfig): string {
           { "type": "mrkdwn", "text": " "},
           { "type": "mrkdwn", "text": "*Work hours:* {{ workHours }} hours"},
           { "type": "mrkdwn", "text": "*Timezone:* {{ timezone }}"}
-          {% if userConfig !== null %}
-          ,
+        ]
+      },
+      {% if userConfig !== null %}
+      {
+        "type": "section",
+        "fields": [
           { "type": "mrkdwn", "text": "*User:* {{ userConfig.displayName }}"},
+          { "type": "mrkdwn", "text": " "},
+          { "type": "mrkdwn", "text": "*Default logtime comment:* {{ userConfig.comment }}"},
           { "type": "mrkdwn", "text": " "},
           { "type": "mrkdwn", "text": "*Token:* {{ token }}******"},
           { "type": "mrkdwn", "text": "*Remind at:* {{ userConfig.remindAt }} "},
           { "type": "mrkdwn", "text": "*Show confirm box:* {{ userConfig.showConfirm }}"},
           { "type": "mrkdwn", "text": "*Include closed issue:* {{ userConfig.includeClosed }}"}
-          {% endif %}
         ]
       },
+      {% endif %}
       {% if userConfig === null %}
       {
         "type": "section",
@@ -145,6 +151,21 @@ export function getModalConfigMessage(
         "hint": {
           "type": "plain_text",
           "text": "Get at <{{ url }}/my/account>"
+        }
+      },
+      {
+        "type": "input",
+        "block_id": "comment",
+        "element": {
+          "type": "plain_text_input",
+          "placeholder": {
+            "type": "plain_text",
+            "text": "Logtime comment"
+          }
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Default logtime comment:"
         }
       },
       {

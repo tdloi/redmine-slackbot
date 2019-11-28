@@ -12,6 +12,7 @@ export interface IUserConfig {
   showConfirm: boolean;
   includeClosed: boolean;
   remindAt: number; // Which hour to remind, 24h format
+  comment: string; // default comment when log time
 }
 
 interface IRedmineIssue {
@@ -148,6 +149,12 @@ export interface IViewSubmissionPayload {
     state: {
       values: {
         token: {
+          [key: string]: {
+            type: 'plain_text_input';
+            value: string;
+          };
+        };
+        comment: {
           [key: string]: {
             type: 'plain_text_input';
             value: string;
