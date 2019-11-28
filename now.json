@@ -9,7 +9,6 @@
         "REDMINE_URL": "@redmine-url",
         "REDMINE_NORMAL_HOUR_ID": "@redmine-normal-hour-id",
         "WORK_HOURS": "@work-hours",
-        "TIMEZONE": "@timezone",
-        "SECRET": "@secret"
+        "TIMEZONE": "@timezone"
     }
 }

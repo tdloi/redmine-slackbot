@@ -6,7 +6,6 @@ A Slack bot remind you to [log time](https://www.redmine.org/projects/redmine/wi
 Before you start: Copy `.env.example` to `.env`, replace following value with your own:
 - `REDMINE_URL`: your Redmine address (DOES NOT include trailing slash `/`)
 - `TIMEZONE`: your current timezone. e.g: 7
-- `SECRET`: random long string. Workaround Now limit 10s timeout, this to make sure request to `/api/message` is from internal request only
 
 ## Slack
 - Create new app at [https://api.slack.com/apps](https://api.slack.com/apps)

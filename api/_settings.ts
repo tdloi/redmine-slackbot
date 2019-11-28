@@ -19,5 +19,4 @@ export const configs = {
   REDMINE_NORMAL_HOUR_ID: parseInt(process.env.REDMINE_NORMAL_HOUR_ID),
   WORK_HOURS: parseInt(process.env.WORK_HOURS),
   TIMEZONE: parseInt(process.env.TIMEZONE), // e.g: 7 or -7
-  SECRET: process.env.SECRET,
 };
