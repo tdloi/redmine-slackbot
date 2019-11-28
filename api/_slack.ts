@@ -8,6 +8,8 @@ import fetch from 'node-fetch';
 
 export const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
 
+// having issue with view submission payload
+// close action for logtime message
 export function isSlackRequest(req: NowRequest): boolean {
   if (req.body === null) return false;
 

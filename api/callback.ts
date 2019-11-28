@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node';
 import { ViewsOpenArguments } from '@slack/web-api';
-import { isSlackRequest, slack, slackApi } from './_slack';
+import { slack, slackApi } from './_slack';
 import { actions } from './_settings';
 import {
   IBlockActionsPayload,
@@ -13,15 +13,6 @@ import { getIssues } from './_redmine';
 import { setUserConfig, getUserConfig } from './_mongo';
 
 export default async (req: NowRequest, res: NowResponse) => {
-  if (
-    req.body.payload &&
-    JSON.parse(req.body.payload).type !== 'view_submission' &&
-    isSlackRequest(req) === false
-  ) {
-    res.status(400).json({ error: 'Your request is not comming from Slack' });
-    return;
-  }
-
   // https://api.slack.com/interactivity/handling#payloads
   const body = JSON.parse(req.body.payload);
 
