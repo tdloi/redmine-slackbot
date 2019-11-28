@@ -20,7 +20,7 @@ export async function getIssues(
   }
 
   const issues: IRedmineIssues = await fetch(
-    `${configs.REDMINE_URL}/issues.json?assigned_to_id=me&status_id=${status}`,
+    `${configs.REDMINE_URL}/issues.json?assigned_to_id=me&status_id=${status}&limit=5`,
     {
       headers: {
         'X-Redmine-API-Key': token,

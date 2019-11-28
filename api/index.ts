@@ -1,10 +1,9 @@
 import { NowRequest, NowResponse } from '@now/node';
 import { getUserConfig } from './_mongo';
 import { IUserConfig, ISlashCommandPayload } from './_interface';
-import { isSlackRequest } from './_slack';
+import { isSlackRequest, slack } from './_slack';
 import { getConfigMessage } from './_messages';
-import { configs } from './_settings';
-import fetch from 'node-fetch';
+import { getLogtimeMessagePayload } from './_logtime';
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (isSlackRequest(req) === false) {
@@ -22,16 +21,12 @@ export default async (req: NowRequest, res: NowResponse) => {
       if (!userConfig) {
         return res.status(200).json({ text: 'Please add your Redmine Token first' });
       }
-      const proto = req.headers['x-forwarded-proto'];
-      const url = req.headers['x-now-deployment-url'];
-      fetch(`${proto}://${url}/api/message`, {
-        method: 'POST',
-        headers: {
-          Authorization: 'Basic ' + Buffer.from(configs.SECRET).toString('base64'),
-        },
-        body: JSON.stringify({ config: userConfig }),
-      });
-      return res.status(200).send(null);
+
+      const logtimeMessage = await getLogtimeMessagePayload(userConfig);
+      if (!logtimeMessage.blocks) {
+        return res.status(200).json({ text: logtimeMessage.text });
+      }
+      return res.status(200).json({ blocks: logtimeMessage.blocks });
     default:
       return res.status(200).json({
         text: 'Invalid command. Available commands: `config`, `log`',
