@@ -1,8 +1,4 @@
-import { WebAPICallResult, View, Block } from '@slack/web-api';
-
-export interface IGlobalConfig {
-  excludesDate: Array<string>; // day to exclude
-}
+import { WebAPICallResult, View } from '@slack/web-api';
 
 export interface IUserConfig {
   _type: 'userConfig';
