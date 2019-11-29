@@ -2,42 +2,36 @@
 
 A Slack bot remind you to [log time](https://www.redmine.org/projects/redmine/wiki/RedmineTimeTracking) everyday
 
-# Setup and deploy
-Before you start: Copy `.env.example` to `.env`, replace following value with your own:
-- `REDMINE_URL`: your Redmine address (DOES NOT include trailing slash `/`)
-- `TIMEZONE`: your current timezone. e.g: 7
+![logtime](images/logtime.png)
 
-## Slack
-- Create new app at [https://api.slack.com/apps](https://api.slack.com/apps)
-- Enable **Interactive Components**
-- Create new slash command: `/command config`, just leave *request url* to random
-- Create new Bot User
-- OAuth and permissions: `bot`, `channels:read`, `chat:write:bot`, `commands`
-- Replace value of `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in **.env**
-- Install app to your workspace
-- Go to your slack workspace at: `your-team.slack.com`, it will redirect you to `https://app.slack.com/client/YOUR_TEAM_ID`, replace `SLACK_TEAM_ID` in .env with your id
+See more at [images](images/README.md)
 
-## MongoDB
-You can create a free database from [mlab](https://mlab.com/) or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Copy connection uri to value of `MONGODB_URI` in **.env**
+## INSTALLTION
+See [INSTALLTION.md](INSTALLATION.md)
 
-## Now
-This app uses Zeit Now Serverless to deploy, to get started, install [Now CLI](https://zeit.co/download)
+## USAGE
+From your Slack app, type `/command config` (with command is your Redmine bot slash command), choose **Edit**.
 
-Run `loadsecret.sh` to load .env to [now secrets](https://zeit.co/docs/v2/environment-variables-and-secrets), alternative, you can run:
-```bash
-now secret add KEY VALUE
-# e.g: now secret MONGODB-URI YOUR_MONGODB_URI
-```
-and so on for each value in `.env`, remember to replace `_` with `-`
+It will display a modal, from here, put your Redmine API (get at `YOUR_REDMINE_URL/my/account`), click submit.
 
-After that, run `now --prod` to deploy, update your now url in slack
+NOTE: To use **Remind At** function (which will automatically send logtime message), you must setup a crob task to send request to `/api/trigger` as instructed in [INSTALLTION.md](INSTALLATION.md#Cron)
 
-- Slash command URL: `YOUR_NOW_URL/api`
-- Interactive URL request URL: `YOUR_NOW_URL/api/callback`
+Then type `/command log` to log time, by default, it will only display first 5 (open) issues, to further customize how issues are listed, use `/command config full`
 
-Note: You can run `loadsecret.sh` with `--force` to force override existing secret
-## Cron
-To run pediod task, you can use one of Cron as a Service such as [Cron-job](https://cron-job.org/), send a `POST` request to `/api/trigger` with Basic Auth info from `AUTH_CRE`
+**Advance config**
+
++ List issues assigned to me only: List all issues that assignee is you
++ List issues created by me only: List all issues that you have created
++ Show confirm dialog: Whether to show confirm dialog on logtime or not
++ Custom query: Custom query that redmine API support, in addition to `assign_to_id` and `author_id` (e.g. project_id=my_project). For more info, see [Redmine Rest issues API](https://www.redmine.org/projects/redmine/wiki/Rest_Issues)
+
+## KNOWN ISSUES
+These are known issues because Slack valid request time is too short and funcion need time to compile (especially first request when function just deployed or cold start)
+
+- **failed with the error "operation_timeout"** when running slash command.
+- Error when submit config.
+
+If you encounter these, just retry your action (e.g. re-submit form) and it will process your request as normal.
 
 # LICENSE
 MIT
