@@ -7,8 +7,7 @@ import { getLogtimeMessagePayload } from './_logtime';
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (isSlackRequest(req) === false) {
-    res.status(400).json({ error: 'Your request is not comming from Slack' });
-    return;
+    return res.status(400).json({ error: 'Your request is not comming from Slack' });
   }
 
   const payload: ISlashCommandPayload = req.body;

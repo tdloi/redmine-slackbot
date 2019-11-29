@@ -17,6 +17,10 @@ import { getCurrentTimeZoneDate, encode } from './_utils';
 import { getLogtimeMessagePayload } from './_logtime';
 
 export default async (req: NowRequest, res: NowResponse) => {
+  if (isSlackRequest(req) === false) {
+    return res.status(400).json({ error: 'Your request is not comming from Slack' });
+  }
+
   // https://api.slack.com/interactivity/handling#payloads
   const body = JSON.parse(req.body.payload);
   const config = await getUserConfig(body.user.id);
