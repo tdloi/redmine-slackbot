@@ -1,15 +1,13 @@
 import { WebClient } from '@slack/web-api';
 import { NowRequest } from '@now/node';
 import { createHmac } from 'crypto';
-import { encode } from 'querystring';
 import dayjs from 'dayjs';
 import { ISlackAPIPayload } from './_interface';
 import fetch from 'node-fetch';
+import { stringify } from 'qs';
 
 export const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
 
-// having issue with view submission payload
-// close action for logtime message
 export function isSlackRequest(req: NowRequest): boolean {
   if (req.body === null) return false;
 
@@ -20,7 +18,7 @@ export function isSlackRequest(req: NowRequest): boolean {
     return false;
   }
 
-  const verifyString = `v0:${timestamp}:${encode(req.body)}`;
+  const verifyString = `v0:${timestamp}:${stringify(req.body, { format: 'RFC1738' })}`;
   const hmac = createHmac('sha256', process.env.SLACK_SIGNING_SECRET);
   hmac.update(verifyString);
   const hex = `v0=${hmac.digest('hex')}`;

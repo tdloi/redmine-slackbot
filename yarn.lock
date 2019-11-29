@@ -82,6 +82,11 @@
   resolved "https://registry.yarnpkg.com/@types/p-queue/-/p-queue-2.3.2.tgz#16bc5fece69ef85efaf2bce8b13f3ebe39c5a1c8"
   integrity sha512-eKAv5Ql6k78dh3ULCsSBxX6bFNuGjTmof5Q/T6PiECDq0Yf8IIn46jCyp3RJvCi8owaEmm3DZH1PEImjBMd/vQ==
 
+"@types/qs@^6.9.0":
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.0.tgz#2a5fa918786d07d3725726f7f650527e1cfeaffd"
+  integrity sha512-c4zji5CjWv1tJxIZkz1oUtGcdOlsH3aza28Nqmm+uNDWBRHoMsjooBEN4czZp1V3iXPihE/VRUOBqg+4Xq0W4g==
+
 "@types/retry@^0.12.0":
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
@@ -1007,10 +1012,10 @@ normalize-path@^3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-now@^16.5.2:
-  version "16.5.2"
-  resolved "https://registry.yarnpkg.com/now/-/now-16.5.2.tgz#0c19c2d1197dcd2aed2dc08fd9610383fcea96a7"
-  integrity sha512-Pv8HMpeTaiLLoNh93Poy5GbiM0oc/CPo1ZXa+o70Nd/ospRaLg7gaFtpZH+My/vS9+xWTDq7hmHjXPCXPtD/pg==
+now@16.6.0:
+  version "16.6.0"
+  resolved "https://registry.yarnpkg.com/now/-/now-16.6.0.tgz#09c7752eacfe6a2f571b8be378a685b2b066a9fc"
+  integrity sha512-OHWgh7QOgXi7IDI68yJ7SBTcQZr8rFGdM4w2W5CdOyCoISletVhb1+KO4g4iBQGVFVNp1W6hv4qJGAOODmib5Q==
 
 npm-bundled@^1.0.1:
   version "1.0.6"
@@ -1148,6 +1153,11 @@ process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
+
+qs@^6.9.1:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.1.tgz#20082c65cb78223635ab1a9eaca8875a29bf8ec9"
+  integrity sha512-Cxm7/SS/y/Z3MHWSxXb8lIFqgqBowP5JMlTUFyJN88y0SGQhVmZnqFK/PeuMX9LzUyWsqqhNxIyg0jlzq946yA==
 
 rc@^1.2.7:
   version "1.2.8"
