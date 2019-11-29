@@ -27,7 +27,7 @@ export async function getLogtimeMessagePayload(
   return {
     channel: config.userId,
     as_user: true,
-    text: ' ',
+    text: 'Redmine logtime reminder',
     blocks: JSON.parse(
       getLogTimeMessage(config, issues, getCurrentTimeZoneDate(dayjs()), loggedHours)
     ),

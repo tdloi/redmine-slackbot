@@ -28,7 +28,9 @@ export default async (req: NowRequest, res: NowResponse) => {
       if (logtimeMessage.blocks.length === 0) {
         return res.status(200).json({ text: logtimeMessage.text });
       }
-      return res.status(200).json({ blocks: logtimeMessage.blocks });
+      return res
+        .status(200)
+        .json({ text: 'Redmine logtime reminder', blocks: logtimeMessage.blocks });
     default:
       return res
         .status(200)
