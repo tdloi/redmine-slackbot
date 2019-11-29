@@ -13,6 +13,17 @@ export interface IUserConfig {
   includeClosed: boolean;
   remindAt: number; // Which hour to remind, 24h format
   comment: string; // default comment when log time
+  assignToMe: boolean; // issue assign to you only
+  createdByMe: boolean; // issue create by you only
+}
+
+export interface IRedmineIssueQuery {
+  status_id: '*' | 'open';
+  offset: number;
+  limit: number;
+  assigned_to_id?: 'me';
+  author_id?: 'me';
+  [key: string]: string | number;
 }
 
 interface IRedmineIssue {
@@ -174,6 +185,18 @@ export interface IViewSubmissionPayload {
           };
         };
         includeClosed: {
+          [key: string]: {
+            type: 'static_select';
+            selected_option: { value: 'true' | 'false' };
+          };
+        };
+        assignToMe: {
+          [key: string]: {
+            type: 'static_select';
+            selected_option: { value: 'true' | 'false' };
+          };
+        };
+        createdByMe: {
           [key: string]: {
             type: 'static_select';
             selected_option: { value: 'true' | 'false' };

@@ -1,28 +1,44 @@
 import fetch from 'node-fetch';
-import { IUserConfig, IRedmineTimeEntries, IRedmineIssues } from './_interface';
+import { encode, decode } from 'querystring';
+import { IUserConfig, IRedmineTimeEntries, IRedmineIssues, IRedmineIssueQuery } from './_interface';
 import { configs } from './_settings';
 import { Dayjs } from 'dayjs';
-import { decode } from './_utils';
+import { decode as decodeB64 } from './_utils';
 
 export async function getIssues(
   userConfig: IUserConfig | null,
   token: string | null = null,
-  offset: number = 0
+  offset: number = 0,
+  customQuery: string = ''
 ): Promise<IRedmineIssues | null> {
   if (token == null && userConfig == null) {
     throw new Error("Both userConfig and Token can't be null");
   }
 
-  let status = '*';
-  if (userConfig && userConfig.includeClosed === false) {
-    status = 'open';
-  }
-  if (userConfig && userConfig.token) {
-    token = decode(userConfig.token);
+  let queryString: IRedmineIssueQuery = {
+    status_id: '*',
+    offset: offset,
+    limit: 5,
+    ...decode(customQuery),
+  };
+
+  if (userConfig) {
+    if (userConfig.includeClosed === false) {
+      queryString.status = 'open';
+    }
+    if (userConfig.token) {
+      token = decodeB64(userConfig.token);
+    }
+    if (userConfig.assignToMe === true) {
+      queryString.assigned_to_id = 'me';
+    }
+    if (userConfig.createdByMe === true) {
+      queryString.author_id = 'me';
+    }
   }
 
   const issues: IRedmineIssues = await fetch(
-    `${configs.REDMINE_URL}/issues.json?assigned_to_id=me&status_id=${status}&limit=5&offset=${offset}`,
+    `${configs.REDMINE_URL}/issues.json?${encode(queryString)}`,
     {
       headers: {
         'X-Redmine-API-Key': token,
@@ -41,7 +57,7 @@ export async function getLoggedHours(userConfig: IUserConfig, date: Dayjs): Prom
     `${configs.REDMINE_URL}/time_entries.json?user_id=me&from=${loggedDate}&to=${loggedDate}`,
     {
       headers: {
-        'X-Redmine-API-Key': decode(userConfig.token),
+        'X-Redmine-API-Key': decodeB64(userConfig.token),
       },
     }
   )
@@ -63,7 +79,7 @@ export async function logTime(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Redmine-API-Key': decode(userConfig.token),
+      'X-Redmine-API-Key': decodeB64(userConfig.token),
     },
     body: JSON.stringify({
       time_entry: {
