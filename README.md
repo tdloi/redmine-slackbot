@@ -36,8 +36,8 @@ After that, run `now --prod` to deploy, update your now url in slack
 - Interactive URL request URL: `YOUR_NOW_URL/api/callback`
 
 Note: You can run `loadsecret.sh` with `--force` to force override existing secret
-## EasyCron
-To run pediod task, you also need an [EasyCron](https://www.easycron.com/) accounts, `AUTH_CRE` is used to auth with app. 
+## Cron
+To run pediod task, you can use one of Cron as a Service such as [Cron-job](https://cron-job.org/), send a `POST` request to `/api/trigger` with Basic Auth info from `AUTH_CRE`
 
 # LICENSE
 MIT
