@@ -17,6 +17,9 @@ export default async (req: NowRequest, res: NowResponse) => {
   switch (payload.text) {
     case 'config':
       return res.status(200).json(JSON.parse(getConfigMessage(userConfig)));
+    case 'configfull':
+    case 'config full':
+      return res.status(200).json(JSON.parse(getConfigMessage(userConfig, true)));
     case 'log':
       if (!userConfig) {
         return res.status(200).json({ text: 'Please add your Redmine Token first' });
@@ -28,6 +31,8 @@ export default async (req: NowRequest, res: NowResponse) => {
       }
       return res.status(200).json({ blocks: logtimeMessage.blocks });
     default:
-      return res.status(200).json({ text: 'Invalid command. Available commands: `config`, `log`' });
+      return res
+        .status(200)
+        .json({ text: 'Invalid command. Available commands: `config`, `config full`, `log`' });
   }
 };
