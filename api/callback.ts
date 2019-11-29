@@ -99,13 +99,13 @@ export default async (req: NowRequest, res: NowResponse) => {
       includeClosed: Object.values(values.includeClosed)[0].selected_option.value === 'true',
       showConfirm: values.showConfirm
         ? Object.values(values.showConfirm)[0].selected_option.value === 'true'
-        : config.showConfirm || true,
+        : (config && config.showConfirm) || true,
       assignToMe: values.assignToMe
         ? Object.values(values.assignToMe)[0].selected_option.value === 'true'
-        : config.assignToMe || true,
+        : (config && config.assignToMe) || true,
       createdByMe: values.createdByMe
         ? Object.values(values.createdByMe)[0].selected_option.value === 'true'
-        : config.assignToMe || false,
+        : (config && config.assignToMe) || false,
     };
 
     // check if token is valid
