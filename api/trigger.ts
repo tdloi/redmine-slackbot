@@ -20,11 +20,13 @@ export default async (req: NowRequest, res: NowResponse) => {
   }
 
   const currentHour = getCurrentTimeZoneDate(dayjs()).hour();
-  await Promise.all(usersConfig.filter(user => user.remindAt === currentHour).map(sendMessage));
-  return res.status(200).send(null);
+  const response = await Promise.all(
+    usersConfig.filter(user => user.remindAt === currentHour).map(sendMessage)
+  );
+  return res.status(200).json({ total: response.length });
 };
 
 async function sendMessage(config: IUserConfig) {
   const logtimeMessage: ChatPostMessageArguments = await getLogtimeMessagePayload(config);
-  await slack.chat.postMessage(logtimeMessage);
+  return await slack.chat.postMessage(logtimeMessage);
 }
