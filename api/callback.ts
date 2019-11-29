@@ -1,15 +1,16 @@
 import { NowRequest, NowResponse } from '@now/node';
 import { ViewsOpenArguments } from '@slack/web-api';
-import { slack, slackApi } from './_slack';
-import { actions } from './_settings';
+import { slack, slackApi, isSlackRequest } from './_slack';
+import { actions, configs } from './_settings';
 import {
   IBlockActionsPayload,
   IViewSubmissionPayload,
   ISlackAPIModalPayload,
   ISlackAPIPayload,
+  IUserConfig,
 } from './_interface';
 import { getModalConfigMessage, getConfigMessage } from './_messages';
-import { getIssues, logTime } from './_redmine';
+import { getIssues, logTime, getLoggedHours } from './_redmine';
 import { setUserConfig, getUserConfig, deleteUserConfig } from './_mongo';
 import dayjs from 'dayjs';
 import { getCurrentTimeZoneDate, encode } from './_utils';
@@ -18,10 +19,10 @@ import { getLogtimeMessagePayload } from './_logtime';
 export default async (req: NowRequest, res: NowResponse) => {
   // https://api.slack.com/interactivity/handling#payloads
   const body = JSON.parse(req.body.payload);
+  const config = await getUserConfig(body.user.id);
 
   if (body.type === 'block_actions') {
     const payload: IBlockActionsPayload = body;
-    const config = await getUserConfig(payload.user.id);
 
     let action = payload.actions[0].action_id;
     action = action.split('__')[0];
@@ -38,9 +39,10 @@ export default async (req: NowRequest, res: NowResponse) => {
         });
         return res.status(200).send(null);
       case actions.CONFIG:
+        const showAll = Object.values(payload.actions)[0].value === 'true';
         await slack.views.open({
           trigger_id: payload.trigger_id,
-          view: JSON.parse(getModalConfigMessage(null, payload.response_url)),
+          view: JSON.parse(getModalConfigMessage(null, payload.response_url, config, showAll)),
         } as ViewsOpenArguments);
         return res.status(200).send(null);
       case actions.PAGINATE:
@@ -54,11 +56,18 @@ export default async (req: NowRequest, res: NowResponse) => {
         });
         return res.status(200).send(null);
       case actions.LOG:
-        const [issueId, hour] = Object.values(payload.actions)[0].value.split('__');
+        const [issueId, hour, currentOffset] = Object.values(payload.actions)[0].value.split('__');
         const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
-        await logTime(config, date, parseInt(hour), parseInt(issueId));
+        const totalHour = await getLoggedHours(config, date);
+        if (totalHour < configs.WORK_HOURS) {
+          await logTime(config, date, parseInt(hour), parseInt(issueId));
+        }
 
-        const logtimeMessage = await getLogtimeMessagePayload(config);
+        const logtimeMessage = await getLogtimeMessagePayload(
+          config,
+          parseInt(currentOffset),
+          totalHour
+        );
         await slackApi(payload.response_url, {
           response_type: 'ephemeral',
           replace_original: true,
@@ -75,41 +84,56 @@ export default async (req: NowRequest, res: NowResponse) => {
     const payload: IViewSubmissionPayload = body;
     const values = payload.view.state.values;
     const { response_url } = JSON.parse(payload.view.private_metadata);
-
-    // check if token is valid
-    const issues = await getIssues(null, Object.values(values.token)[0].value);
-    if (issues === null) {
-      return res.status(200).send({
-        response_action: 'update',
-        view: JSON.parse(getModalConfigMessage('Invalid Token', response_url)),
-      } as ISlackAPIModalPayload);
-    }
-
-    const updated = await setUserConfig(payload.user.id, {
+    const showAll = values.showConfirm !== undefined;
+    const newUserConfig: IUserConfig = {
       _type: 'userConfig',
       userId: payload.user.id,
       displayName: payload.user.name,
       token: encode(Object.values(values.token)[0].value),
       comment: Object.values(values.comment)[0].value,
       remindAt: parseInt(Object.values(values.remindAt)[0].selected_option.value),
-      showConfirm: Object.values(values.showConfirm)[0].selected_option.value === 'true',
       includeClosed: Object.values(values.includeClosed)[0].selected_option.value === 'true',
-    });
+      showConfirm: values.showConfirm
+        ? Object.values(values.showConfirm)[0].selected_option.value === 'true'
+        : config.showConfirm || true,
+      assignToMe: values.assignToMe
+        ? Object.values(values.assignToMe)[0].selected_option.value === 'true'
+        : config.assignToMe || true,
+      createdByMe: values.createdByMe
+        ? Object.values(values.createdByMe)[0].selected_option.value === 'true'
+        : config.assignToMe || false,
+    };
 
-    if (updated === false) {
+    // check if token is valid
+    const issues = await getIssues(null, Object.values(values.token)[0].value);
+    if (issues === null) {
       return res.status(200).send({
         response_action: 'update',
         view: JSON.parse(
-          getModalConfigMessage('Something went wrong. Please retry!', response_url)
+          getModalConfigMessage('Invalid Token', response_url, newUserConfig, showAll)
         ),
       } as ISlackAPIModalPayload);
     }
 
-    const config = await getUserConfig(payload.user.id);
+    const updated = await setUserConfig(payload.user.id, newUserConfig);
+    if (updated === false) {
+      return res.status(200).send({
+        response_action: 'update',
+        view: JSON.parse(
+          getModalConfigMessage(
+            'Something went wrong. Please retry!',
+            response_url,
+            newUserConfig,
+            showAll
+          )
+        ),
+      } as ISlackAPIModalPayload);
+    }
+
     const response = await slackApi(response_url, {
       response_type: 'ephemeral',
       replace_original: true,
-      ...JSON.parse(getConfigMessage(config)),
+      ...JSON.parse(getConfigMessage(newUserConfig, showAll)),
     } as ISlackAPIPayload);
     if (response.ok === false) {
       console.log('Expired response_url');

@@ -6,7 +6,7 @@ import { decode } from './_utils';
 
 nunjucks.configure({ autoescape: true });
 
-export function getConfigMessage(userConfig: IUserConfig): string {
+export function getConfigMessage(userConfig: IUserConfig, showAll: boolean = false): string {
   const token = userConfig ? decode(userConfig.token) : '';
   return nunjucks.renderString(
     `
@@ -29,10 +29,27 @@ export function getConfigMessage(userConfig: IUserConfig): string {
           { "type": "mrkdwn", "text": " "},
           { "type": "mrkdwn", "text": "*Default logtime comment:* {{ userConfig.comment }}"},
           { "type": "mrkdwn", "text": " "},
-          { "type": "mrkdwn", "text": "*Token:* {{ token }}******"},
-          { "type": "mrkdwn", "text": "*Remind at:* {{ userConfig.remindAt }} "},
-          { "type": "mrkdwn", "text": "*Show confirm box:* {{ userConfig.showConfirm }}"},
+          { "type": "mrkdwn", "text": "*Token:* {{ token }}******"}
+        ]
+      },
+      {% endif %}
+      {% if userConfig !== null %}
+      {
+        "type": "section",
+        "fields": [
+          {% if showAll %}
+          { "type": "mrkdwn", "text": "*Assign to me only:* {{ userConfig.assignToMe }}"},
+          { "type": "mrkdwn", "text": "*Created by me only:* {{ userConfig.createdByMe }}"},
+          { "type": "mrkdwn", "text": "*Custom query:* {{ userConfig.customQuery }}"},
+          { "type": "mrkdwn", "text": " "},
+          {% endif %}
+          { "type": "mrkdwn", "text": "*Remind at:* {{ userConfig.remindAt }}"},
+          { "type": "mrkdwn", "text": " "},
           { "type": "mrkdwn", "text": "*Include closed issue:* {{ userConfig.includeClosed }}"}
+          {% if showAll %}
+          ,
+          { "type": "mrkdwn", "text": "*Show confirm box:* {{ userConfig.showConfirm }}"}
+          {% endif %}
         ]
       },
       {% endif %}
@@ -51,7 +68,8 @@ export function getConfigMessage(userConfig: IUserConfig): string {
           { "type": "button",
             "text": { "type": "plain_text", "text": "Edit", "emoji": true },
             "style": "primary",
-            "action_id": "{{ actions.edit }}"
+            "action_id": "{{ actions.edit }}",
+            "value": "{% if showAll %}true{% else %}false{% endif %}"
           },
           {
             "type": "button",
@@ -97,13 +115,16 @@ export function getConfigMessage(userConfig: IUserConfig): string {
       workHours: configs.WORK_HOURS,
       timezone: configs.TIMEZONE,
       actions: { edit: actions.CONFIG, close: actions.CLOSE, delete: actions.DELETE },
+      showAll: showAll,
     }
   );
 }
 
 export function getModalConfigMessage(
   error_message: string = null,
-  response_url: string = ''
+  response_url: string = '',
+  userConfig: IUserConfig = null,
+  showAll: boolean = false
 ): string {
   return nunjucks.renderString(
     `
@@ -140,6 +161,9 @@ export function getModalConfigMessage(
         "block_id": "token",
         "element": {
           "type": "plain_text_input",
+          {% if token %}
+          "initial_value": "{{ token }}",
+          {% endif %}
           "placeholder": {
             "type": "plain_text",
             "text": "Your Redmine API access token"
@@ -159,54 +183,56 @@ export function getModalConfigMessage(
         "block_id": "comment",
         "element": {
           "type": "plain_text_input",
+          {% if config %}
+          "initial_value": "{{ config.comment }}"
+          {% else %}
           "placeholder": {
             "type": "plain_text",
             "text": "Logtime comment"
           }
+          {% endif %}
         },
         "label": {
           "type": "plain_text",
           "text": "Default logtime comment:"
         }
       },
+      {% if showAll %}
       {
         "type": "input",
-        "block_id": "remindAt",
+        "block_id": "customQuery",
         "element": {
-          "type": "static_select",
+          "type": "plain_text_input",
+          {% if config and config.customQuery %}
+          "initial_value": "{{ config.customQuery }}"
+          {% else %}
           "placeholder": {
             "type": "plain_text",
-            "text": "Select an hour",
-            "emoji": true
-          },
-          "options": [
-            {% for i in range(7, 19) %}
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "{{ i }}",
-                "emoji": true
-              },
-              "value": "{{ i }}"
-            }
-            {{ "," if not loop.last }}
-            {% endfor %}
-          ]
+            "text": "Custom issues query"
+          }
+          {% endif %}
         },
         "label": {
           "type": "plain_text",
-          "text": "Reminder hours",
-          "emoji": true
+          "text": "Custom query:"
+        },
+        "optional": true,
+        "hint": {
+          "type": "plain_text",
+          "text": "<https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Listing-issues>"
         }
       },
       {
         "type": "input",
-        "block_id": "includeClosed",
+        "block_id": "assignToMe",
         "element": {
           "type": "static_select",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Include closed issues"
+          "initial_option": {
+            "text": {
+              "type": "plain_text",
+              "text": "{% if config and not config.assignToMe %}No{% else %}Yes{% endif %}"
+            },
+            "value": "{% if config %}{{ config.assignToMe }}{% else %}true{% endif %}"
           },
           "options": [
             {
@@ -227,7 +253,42 @@ export function getModalConfigMessage(
         },
         "label": {
           "type": "plain_text",
-          "text": "Include closed issues",
+          "text": "List issues assigned to me only",
+          "emoji": true
+        }
+      },
+      {
+        "type": "input",
+        "block_id": "createdByMe",
+        "element": {
+          "type": "static_select",
+          "initial_option": {
+            "text": {
+              "type": "plain_text",
+              "text": "{% if config and config.createdByMe %}Yes{% else %}No{% endif %}"
+            },
+            "value": "{% if config %}{{ config.createdByMe }}{% else %}false{% endif %}"
+          },
+          "options": [
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "Yes"
+              },
+              "value": "true"
+            },
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "No"
+              },
+              "value": "false"
+            }
+          ]
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "List issues created by me only",
           "emoji": true
         }
       },
@@ -236,9 +297,16 @@ export function getModalConfigMessage(
         "block_id": "showConfirm",
         "element": {
           "type": "static_select",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Show confirm dialog"
+          "initial_option": {
+            "text": {
+              "type": "plain_text",
+              {% if config and config.showConfirm %}
+              "text": "Yes"
+              {% else %}
+              "text": "No"
+              {% endif %}
+            },
+            "value": "{% if config %}{{ config.showConfirm }}{% else %}false{% endif %}"
           },
           "options": [
             {
@@ -265,6 +333,84 @@ export function getModalConfigMessage(
           "type": "plain_text",
           "text": "Show confirm dialog each time click logtime"
         }
+      },
+      {% endif %}
+      {
+        "type": "input",
+        "block_id": "remindAt",
+        "element": {
+          "type": "static_select",
+          "placeholder": {
+            "type": "plain_text",
+            "text": "Select an hour",
+            "emoji": true
+          },
+          {% if config %}
+          "initial_option": {
+            "text": {
+              "type": "plain_text",
+              "text": "{{ config.remindAt }}"
+            },
+            "value": "{{ config.remindAt }}"
+          },
+          {% endif %}
+          "options": [
+            {% for i in range(7, 19) %}
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "{{ i }}"
+              },
+              "value": "{{ i }}"
+            }
+            {{ "," if not loop.last }}
+            {% endfor %}
+          ]
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Reminder hours",
+          "emoji": true
+        }
+      },
+      {
+        "type": "input",
+        "block_id": "includeClosed",
+        "element": {
+          "type": "static_select",
+          "initial_option": {
+            "text": {
+              "type": "plain_text",
+              {% if config and config.includeClosed %}
+              "text": "Yes"
+              {% else %}
+              "text": "No"
+              {% endif %}
+            },
+            "value": "{% if config %}{{ config.includeClosed }}{% else %}false{% endif %}"
+          },
+          "options": [
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "Yes"
+              },
+              "value": "true"
+            },
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "No"
+              },
+              "value": "false"
+            }
+          ]
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Include closed issues",
+          "emoji": true
+        }
       }
     ]}
     `,
@@ -272,6 +418,9 @@ export function getModalConfigMessage(
       url: configs.REDMINE_URL,
       error: error_message,
       message: { url: response_url },
+      config: userConfig,
+      token: (userConfig && userConfig.token && decode(userConfig.token)) || null,
+      showAll: showAll,
     }
   );
 }
@@ -319,7 +468,7 @@ export function getLogTimeMessage(
               "text": "8h"
             },
             "style": "primary",
-            "value": "{{ issue.id }}__8",
+            "value": "{{ issue.id }}__8__{{ pagination.current }}",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -348,7 +497,7 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "4h"
             },
-            "value": "{{ issue.id }}__4",
+            "value": "{{ issue.id }}__4__{{ pagination.current }}",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -377,7 +526,7 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "2h"
             },
-            "value": "{{ issue.id }}__2",
+            "value": "{{ issue.id }}__2__{{ pagination.current }}",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -406,7 +555,7 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "1h"
             },
-            "value": "{{ issue.id }}__1",
+            "value": "{{ issue.id }}__1__{{ pagination.current }}",
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -457,7 +606,7 @@ export function getLogTimeMessage(
             },
             "style": "primary",
             "value": "{{ pagination.next }}"
-          },				
+          },
           {% endif %}
           {
             "type": "button",
@@ -498,7 +647,7 @@ export function getLogTimeMessage(
       hour: loggedHour,
       remainHour: configs.WORK_HOURS - loggedHour,
       actions: { log: actions.LOG, close: actions.CLOSE, paginate: actions.PAGINATE },
-      pagination: { prev: prev, next: next },
+      pagination: { prev: prev, next: next, current: issues.offset },
     }
   );
 }
