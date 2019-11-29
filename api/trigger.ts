@@ -2,7 +2,7 @@ import { getUsersConfig } from './_mongo';
 import { NowRequest, NowResponse } from '@now/node';
 import { configs } from './_settings';
 import dayjs from 'dayjs';
-import { ChatPostMessageArguments } from '@slack/web-api';
+import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
 import { getLogtimeMessagePayload } from './_logtime';
 import { slack } from './_slack';
 import { IUserConfig } from './_interface';
@@ -28,5 +28,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 async function sendMessage(config: IUserConfig) {
   const logtimeMessage: ChatPostMessageArguments = await getLogtimeMessagePayload(config);
+  if (logtimeMessage.blocks.length === 0) {
+    return { ok: true };
+  }
   return await slack.chat.postMessage(logtimeMessage);
 }
