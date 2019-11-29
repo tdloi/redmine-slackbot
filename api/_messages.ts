@@ -447,12 +447,21 @@ export function getLogTimeMessage(
       {
         "type": "divider"
       },
+      {% if issues.issues.length === 0 %}
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "No issues found"
+        }
+      },
+      {% endif %}
       {% for issue in issues.issues %}
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": "\`[{{ issue.project.name }}]\` \`#{{ issue.id }}\`: {{ issue.subject }}"
+          "text": "\`[<{{ url }}/projects/{{ issue.project.id }} | {{ issue.project.name }}>]\` \`<{{ url }}/issues/{{ issue.id }} | #{{ issue.id }}>\`: {{ issue.subject }}"
         }
       },
       {
@@ -641,6 +650,7 @@ export function getLogTimeMessage(
     ]
     `,
     {
+      url: configs.REDMINE_URL,
       config: userConfig,
       issues: issues,
       date: logDate,
