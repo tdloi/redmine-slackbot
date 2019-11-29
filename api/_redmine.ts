@@ -24,7 +24,7 @@ export async function getIssues(
 
   if (userConfig) {
     if (userConfig.includeClosed === false) {
-      queryString.status = 'open';
+      queryString.status_id = 'open';
     }
     if (userConfig.token) {
       token = decodeB64(userConfig.token);
