@@ -4,6 +4,7 @@ import { getIssues, getLoggedHours } from './_redmine';
 import dayjs from 'dayjs';
 import { configs } from './_settings';
 import { getLogTimeMessage } from './_messages';
+import { getCurrentTimeZoneDate } from './_utils';
 
 export async function getLogtimeMessagePayload(
   config: IUserConfig,
@@ -12,7 +13,7 @@ export async function getLogtimeMessagePayload(
 ): Promise<ChatPostMessageArguments> {
   const issues = await getIssues(config, null, offset);
   if (loggedHours === -1) {
-    loggedHours = await getLoggedHours(config, dayjs());
+    loggedHours = await getLoggedHours(config, getCurrentTimeZoneDate(dayjs()));
   }
   if (loggedHours >= configs.WORK_HOURS) {
     return {
@@ -27,6 +28,8 @@ export async function getLogtimeMessagePayload(
     channel: config.userId,
     as_user: true,
     text: ' ',
-    blocks: JSON.parse(getLogTimeMessage(config, issues, dayjs(), loggedHours)),
+    blocks: JSON.parse(
+      getLogTimeMessage(config, issues, getCurrentTimeZoneDate(dayjs()), loggedHours)
+    ),
   };
 }

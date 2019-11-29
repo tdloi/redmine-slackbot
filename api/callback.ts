@@ -42,6 +42,7 @@ export default async (req: NowRequest, res: NowResponse) => {
           blocks: [],
         });
         return res.status(200).send(null);
+
       case actions.CONFIG:
         const showAll = Object.values(payload.actions)[0].value === 'true';
         await slack.views.open({
@@ -49,6 +50,7 @@ export default async (req: NowRequest, res: NowResponse) => {
           view: JSON.parse(getModalConfigMessage(null, payload.response_url, config, showAll)),
         } as ViewsOpenArguments);
         return res.status(200).send(null);
+
       case actions.PAGINATE:
         const offset = Object.values(payload.actions)[0].value;
         const messages = await getLogtimeMessagePayload(config, parseInt(offset));
@@ -59,6 +61,7 @@ export default async (req: NowRequest, res: NowResponse) => {
           blocks: messages.blocks,
         });
         return res.status(200).send(null);
+
       case actions.LOG:
         const [issueId, hour, currentOffset] = Object.values(payload.actions)[0].value.split('__');
         const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
@@ -66,7 +69,6 @@ export default async (req: NowRequest, res: NowResponse) => {
         if (totalHour < configs.WORK_HOURS) {
           await logTime(config, date, parseInt(hour), parseInt(issueId));
         }
-
         const logtimeMessage = await getLogtimeMessagePayload(
           config,
           parseInt(currentOffset),
@@ -79,6 +81,7 @@ export default async (req: NowRequest, res: NowResponse) => {
           blocks: logtimeMessage.blocks,
         });
         return res.status(200).send(null);
+
       default:
         return res.status(400).send(null);
     }
