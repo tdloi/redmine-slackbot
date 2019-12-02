@@ -1,6 +1,9 @@
 .now
 node_modules/
+coverage/
+
 .env*
 !.env.example
 .vscode/
+
 yarn-error.log

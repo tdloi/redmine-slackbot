@@ -2,7 +2,6 @@
     "env": {
         "MONGODB_URI": "@mongodb-uri",
         "TRIGGER_CREDENTIAL": "@trigger-credential",
-        "SLACK_TEAM_ID": "@slack-team-id",
         "SLACK_BOT_TOKEN": "@slack-bot-token",
         "SLACK_SIGNING_SECRET": "@slack-signing-secret",
         "REDMINE_URL": "@redmine-url",

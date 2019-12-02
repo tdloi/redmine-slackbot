@@ -1,8 +1,15 @@
 .env
 .env.example
+
+# docs and script
 loadsecret.sh
 LICENSE
+INSTALLATION.md
 README.md
+images/
+tests/
+
+# tools
 .vscode
 .prettierrc
 yarn-error.log

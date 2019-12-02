@@ -10,17 +10,30 @@
   },
   "devDependencies": {
     "@now/node": "^1.1.2",
+    "@types/jest": "^24.0.23",
     "@types/mongodb": "^3.3.11",
     "@types/node-fetch": "^2.5.3",
     "@types/nunjucks": "^3.1.3",
     "@types/qs": "^6.9.0",
-    "now": "16.6.0"
+    "jest": "^24.9.0",
+    "now": "16.6.0",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.2"
   },
   "engines": {
     "node": "10.x"
   },
   "scripts": {
     "start": "now dev",
-    "now": "now --prod"
+    "now": "now --prod",
+    "test": "jest"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/tests/"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    }
   }
 }
