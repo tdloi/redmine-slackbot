@@ -8,6 +8,7 @@ import {
   ISlackAPIModalPayload,
   ISlackAPIPayload,
   IUserConfig,
+  IRedmineTimeEntries,
 } from './_interface';
 import { getModalConfigMessage, getConfigMessage } from './_messages';
 import { getIssues, logTime, getLoggedHours } from './_redmine';
@@ -65,9 +66,15 @@ export default async (req: NowRequest, res: NowResponse) => {
       case actions.LOG:
         const [issueId, hour, currentOffset] = Object.values(payload.actions)[0].value.split('__');
         const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
-        const totalHour = await getLoggedHours(config, date);
+        let totalHour = await getLoggedHours(config, date);
         if (totalHour < configs.WORK_HOURS) {
-          await logTime(config, date, parseInt(hour), parseInt(issueId));
+          const timeEntries: IRedmineTimeEntries = await logTime(
+            config,
+            date,
+            parseInt(hour),
+            parseInt(issueId)
+          );
+          totalHour += timeEntries.time_entry.hours;
         }
         const logtimeMessage = await getLogtimeMessagePayload(
           config,

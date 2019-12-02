@@ -50,6 +50,7 @@ interface IRedmineTimeEntry {
 }
 
 export interface IRedmineTimeEntries {
+  time_entry: IRedmineTimeEntry;
   time_entries: Array<IRedmineTimeEntry>;
   total_count: number;
 }
