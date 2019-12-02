@@ -10,7 +10,7 @@ import { getCurrentTimeZoneDate, encode } from './_utils';
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send(null);
-  if (req.headers.authorization !== `Basic ${encode(configs.AUTH_CRE)}`) {
+  if (req.headers.authorization !== `Basic ${encode(configs.TRIGGER_CREDENTIAL)}`) {
     return res.status(401).send(null);
   }
 

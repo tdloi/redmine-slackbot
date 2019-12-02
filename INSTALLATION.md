@@ -38,7 +38,7 @@ After that, run `now --prod` to deploy, update your now url in slack
 Note: You can run `loadsecret.sh` with `--force` to force override existing secret
 
 ## Cron
-To send reminder automatically so you don't have to run `/command log` manually each time, you have to setup a cron job, you can use one of *Cron as a Service* such as [Cron-job](https://cron-job.org/), send a `POST` request to `/api/trigger` with **Basic Auth** info from `AUTH_CRE`
+To send reminder automatically so you don't have to run `/command log` manually each time, you have to setup a cron job, you can use one of *Cron as a Service* such as [Cron-job](https://cron-job.org/), send a `POST` request to `/api/trigger` with **Basic Auth** info from `TRIGGER_CREDENTIAL`
 
 Please make sure your cron request timeout is not too short (ideally 10s), otherwise, it will fail because you have to wait for building function, process sending request.
 

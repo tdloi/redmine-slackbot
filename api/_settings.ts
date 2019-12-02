@@ -9,7 +9,7 @@ export const actions = {
 export const configs = {
   SLACK_TOKEN: process.env.SLACK_BOT_TOKEN,
   SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET,
-  AUTH_CRE: process.env.AUTH_CRE,
+  TRIGGER_CREDENTIAL: process.env.TRIGGER_CREDENTIAL,
   COLLECTION: 'configs',
 
   // DOES NOT include trailing slash
