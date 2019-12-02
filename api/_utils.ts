@@ -1,13 +1,17 @@
 import { configs } from './_settings';
-import { Dayjs } from 'dayjs';
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
 
-export function getCurrentTimeZoneDate(date: Dayjs) {
+export function getDate(date: string | number = null) {
+  dayjs.extend(utc);
+  const currentDate = date ? dayjs.utc(date) : dayjs.utc();
+
   const timezone = configs.TIMEZONE;
   if (timezone > 0) {
-    return date.add(timezone, 'hour');
+    return currentDate.add(timezone, 'hour');
   }
 
-  return date.subtract(timezone, 'hour');
+  return currentDate.subtract(timezone * -1, 'hour');
 }
 
 export function encode(text: string) {

@@ -1,12 +1,11 @@
 import { getUsersConfig } from './_mongo';
 import { NowRequest, NowResponse } from '@now/node';
 import { configs } from './_settings';
-import dayjs from 'dayjs';
-import { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api';
+import { ChatPostMessageArguments } from '@slack/web-api';
 import { getLogtimeMessagePayload } from './_logtime';
 import { slack } from './_slack';
 import { IUserConfig } from './_interface';
-import { getCurrentTimeZoneDate, encode } from './_utils';
+import { encode, getDate } from './_utils';
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send(null);
@@ -19,7 +18,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     return res.status(200).send(null);
   }
 
-  const currentHour = getCurrentTimeZoneDate(dayjs()).hour();
+  const currentHour = getDate().hour();
   const response = await Promise.all(
     usersConfig.filter(user => user.remindAt === currentHour).map(sendMessage)
   );

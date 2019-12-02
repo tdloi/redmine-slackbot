@@ -13,7 +13,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   const payload: ISlashCommandPayload = req.body;
   const userConfig: IUserConfig = await getUserConfig(payload.user_id);
 
-  switch (payload.text) {
+  switch (payload.text.toLowerCase()) {
     case 'config':
       return res.status(200).json(JSON.parse(getConfigMessage(userConfig)));
     case 'configfull':

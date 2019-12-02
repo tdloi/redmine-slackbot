@@ -13,8 +13,7 @@ import {
 import { getModalConfigMessage, getConfigMessage } from './_messages';
 import { getIssues, logTime, getLoggedHours } from './_redmine';
 import { setUserConfig, getUserConfig, deleteUserConfig } from './_mongo';
-import dayjs from 'dayjs';
-import { getCurrentTimeZoneDate, encode } from './_utils';
+import { getDate, encode } from './_utils';
 import { getLogtimeMessagePayload } from './_logtime';
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -65,7 +64,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
       case actions.LOG:
         const [issueId, hour, currentOffset] = Object.values(payload.actions)[0].value.split('__');
-        const date = getCurrentTimeZoneDate(dayjs(parseFloat(payload.container.message_ts) * 1000));
+        const date = getDate(parseFloat(payload.container.message_ts) * 1000);
         let totalHour = await getLoggedHours(config, date);
         if (totalHour < configs.WORK_HOURS) {
           const timeEntries: IRedmineTimeEntries = await logTime(
