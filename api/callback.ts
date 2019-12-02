@@ -108,7 +108,7 @@ export default async (req: NowRequest, res: NowResponse) => {
         : (config && config.assignToMe) || true,
       createdByMe: values.createdByMe
         ? Object.values(values.createdByMe)[0].selected_option.value === 'true'
-        : (config && config.assignToMe) || false,
+        : (config && config.createdByMe) || false,
     };
 
     // check if token is valid

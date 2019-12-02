@@ -52,13 +52,12 @@ export function getConfigMessage(userConfig: IUserConfig, showAll: boolean = fal
           {% endif %}
         ]
       },
-      {% endif %}
-      {% if userConfig === null %}
+      {% else %}
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": ":x: You have not registered yet. Click *Edit* to add info"
+          "text": ":x: No configuration found. Click *Edit* to add one"
         }
       },
       {% endif %}
@@ -477,7 +476,8 @@ export function getLogTimeMessage(
               "text": "8h"
             },
             "style": "primary",
-            "value": "{{ issue.id }}__8__{{ pagination.current }}",
+            "value": "{{ issue.id }}__8__{{ pagination.current }}"
+            {% if config.showConfirm %},
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -496,6 +496,7 @@ export function getLogTimeMessage(
                 "text": "Stop, I've changed my mind!"
               }
             }
+            {% endif %}
           },
           {% endif %}
           {% if remainHour >= 4 %}
@@ -506,7 +507,8 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "4h"
             },
-            "value": "{{ issue.id }}__4__{{ pagination.current }}",
+            "value": "{{ issue.id }}__4__{{ pagination.current }}"
+            {% if config.showConfirm %},
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -525,6 +527,7 @@ export function getLogTimeMessage(
                 "text": "Stop, I've changed my mind!"
               }
             }
+            {% endif %}
           },
           {% endif %}
           {% if remainHour >= 2 %}
@@ -535,7 +538,8 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "2h"
             },
-            "value": "{{ issue.id }}__2__{{ pagination.current }}",
+            "value": "{{ issue.id }}__2__{{ pagination.current }}"
+            {% if config.showConfirm %},
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -554,6 +558,7 @@ export function getLogTimeMessage(
                 "text": "Stop, I've changed my mind!"
               }
             }
+            {% endif %}
           },
           {% endif %}
           {% if remainHour >= 1 %}
@@ -564,7 +569,8 @@ export function getLogTimeMessage(
               "type": "plain_text",
               "text": "1h"
             },
-            "value": "{{ issue.id }}__1__{{ pagination.current }}",
+            "value": "{{ issue.id }}__1__{{ pagination.current }}"
+            {% if config.showConfirm %},
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -583,6 +589,7 @@ export function getLogTimeMessage(
                 "text": "Stop, I've changed my mind!"
               }
             }
+            {% endif %}
           }
           {% endif %}
         ]
@@ -625,7 +632,8 @@ export function getLogTimeMessage(
               "text": "Close"
             },
             "style": "danger",
-            "value": " ",
+            "value": " "
+            {% if config.showConfirm %},
             "confirm": {
               "title": {
                 "type": "plain_text",
@@ -644,6 +652,7 @@ export function getLogTimeMessage(
                 "text": "Exit"
               }
             }
+            {% endif %}
           }
         ]
       }
