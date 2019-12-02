@@ -2,7 +2,7 @@
 
 while read p; do
   key=$(echo $p | cut -f1 -d = | tr '[:upper:]' '[:lower:]')
-  value=$(echo $p | cut -f2 -d =)
+  value=${p#*=}
   now secret add "${key//_/-}"  "$value"
   [[ ! $? -eq 0 ]] && [[ "$1" = '--force' ]] \
     && echo "Override $key" \
