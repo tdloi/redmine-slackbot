@@ -1,4 +1,8 @@
 {
+  "name": "redmine-bot",
+  "version": "0.1.0",
+  "author": "Loi Tran",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@slack/web-api": "^5.5.0",
@@ -21,7 +25,7 @@
     "typescript": "^3.7.2"
   },
   "engines": {
-    "node": "10.x"
+    "node": ">=10.x"
   },
   "scripts": {
     "start": "now dev",
