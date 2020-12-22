@@ -1,9 +1,16 @@
 {
   "name": "redmine-bot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Loi Tran",
   "license": "MIT",
   "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "dependencies": {
     "@slack/web-api": "^5.5.0",
     "dayjs": "^1.8.17",
@@ -14,30 +21,54 @@
   },
   "devDependencies": {
     "@now/node": "^1.1.2",
-    "@types/jest": "^24.0.23",
+    "@size-limit/preset-small-lib": "^4.9.1",
     "@types/mongodb": "^3.3.11",
     "@types/node-fetch": "^2.5.3",
     "@types/nunjucks": "^3.1.3",
     "@types/qs": "^6.9.0",
+    "husky": ">=4",
     "jest": "^24.9.0",
+    "lint-staged": ">=10",
     "now": "16.6.0",
-    "ts-jest": "^24.2.0",
-    "typescript": "^3.7.2"
+    "prettier": "^2.2.1",
+    "size-limit": "^4.9.1",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.0.3",
+    "typescript": "^4.1.3"
   },
+  "size-limit": [
+    {
+      "path": "dist/index.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/index.esm.js",
+      "limit": "10 KB"
+    }
+  ],
   "engines": {
-    "node": ">=10.x"
+    "node": ">=10"
   },
   "scripts": {
-    "start": "now dev",
+    "start": "tsdx watch",
     "now": "now --prod",
-    "test": "jest"
+    "test": "tsdx test",
+    "build": "tsdx build",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
   },
-  "jest": {
-    "roots": [
-      "<rootDir>/tests/"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true
   }
 }
